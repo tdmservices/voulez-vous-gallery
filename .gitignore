@@ -1,0 +1,11 @@
+# dev tooling / local preview
+.claude/
+.vercel
+node_modules/
+.DS_Store
+
+# heavy original product images — only the optimized web/ versions are deployed
+assets/products/*.jpg
+
+# Shopify import artifact (not needed at runtime)
+products-shopify.csv
