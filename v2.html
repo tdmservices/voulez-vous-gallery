@@ -15,7 +15,7 @@ canvas{display:block}
 <div id="stick"><div id="knob"></div></div>
 <div id="xh"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+<script src="assets/3d/RGBELoader.js"></script>
 <script>
 const canvas=document.getElementById('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
@@ -27,6 +27,7 @@ renderer.toneMappingExposure=1.0;
 renderer.physicallyCorrectLights=true;
 
 const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xd2d7da);   // fallback sky → never a black screen
 scene.fog=new THREE.Fog(0xd6dadd,40,210);
 const camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,0.1,500);
 
@@ -56,12 +57,16 @@ function allowed(x,z){const r=Math.hypot(x,z);return (r<R_OUT-0.8&&r>1.5)||(Math
 
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 
-/* ── HDRI sea environment ── */
-const pmrem=new THREE.PMREMGenerator(renderer);pmrem.compileEquirectangularShader();
-new THREE.RGBELoader().load('assets/3d/sky.hdr',hdr=>{
-  scene.environment=pmrem.fromEquirectangular(hdr).texture;
-  hdr.mapping=THREE.EquirectangularReflectionMapping;scene.background=hdr;
-});
+/* ── HDRI sea environment (guarded — gallery still renders if it fails) ── */
+if(window.THREE&&THREE.RGBELoader){
+  try{
+    const pmrem=new THREE.PMREMGenerator(renderer);pmrem.compileEquirectangularShader();
+    new THREE.RGBELoader().load('assets/3d/sky.hdr',hdr=>{
+      try{scene.environment=pmrem.fromEquirectangular(hdr).texture;
+        hdr.mapping=THREE.EquirectangularReflectionMapping;scene.background=hdr;}catch(e){console.warn('[VV] env',e);}
+    },undefined,()=>console.warn('[VV] sky.hdr failed to load'));
+  }catch(e){console.warn('[VV] RGBELoader unavailable',e);}
+}else{console.warn('[VV] RGBELoader missing — using fallback sky');}
 
 /* ── materials ── */
 const TL=new THREE.TextureLoader();
@@ -191,7 +196,8 @@ function brandTex(){
 const porch=new THREE.Mesh(new THREE.BoxGeometry(6,0.4,7),stone);porch.position.set(0,-0.06,R_OUT+3);scene.add(porch);
 [-3,3].forEach(sx=>{const w=new THREE.Mesh(new THREE.BoxGeometry(0.45,2.6,7),wallMat);w.position.set(sx,1.3,R_OUT+3);scene.add(w);});
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.45));
+scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.6));
+const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun); // guarantees lit geometry even if the HDRI env fails
 
 /* ── render loop ── */
 const clock=new THREE.Clock();
