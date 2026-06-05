@@ -28,7 +28,7 @@ renderer.toneMappingExposure=1.05;
 renderer.physicallyCorrectLights=true;
 
 const scene=new THREE.Scene();
-scene.fog=new THREE.Fog(0xdfe3e6,28,95);                 // soft daylight haze
+scene.fog=new THREE.Fog(0xc6cac8,40,180);                // haze — mountains stay faintly visible
 const camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,0.1,400);
 camera.position.set(0,2.0,19); // start on the entrance porch, facing into the dome (−Z)
 
@@ -107,9 +107,9 @@ for(let i=0;i<N;i++){
   m.position.set(Math.sin(a)*R,0,Math.cos(a)*R);
   m.rotation.y=a+Math.PI;
   scene.add(m);
-  // dark skirting strip along the base of each bay
-  const sk=new THREE.Mesh(new THREE.BoxGeometry(chord,1.0,0.15),darkBase);
-  sk.position.set(Math.sin(a)*(R-0.02),0.5,Math.cos(a)*(R-0.02));sk.rotation.y=a+Math.PI;scene.add(sk);
+  // dark baseboard — set just in FRONT of the wall face (no z-fighting with the panel)
+  const sk=new THREE.Mesh(new THREE.BoxGeometry(chord*0.96,0.85,0.08),darkBase);
+  sk.position.set(Math.sin(a)*(R-0.72),0.42,Math.cos(a)*(R-0.72));sk.rotation.y=a+Math.PI;scene.add(sk);
 }
 
 /* ── DRUM + GLASS RIBBED DOME ── */
@@ -147,15 +147,20 @@ function terrazzo(){
   }
   const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(5,5);t.encoding=THREE.sRGBEncoding;return t;
 }
-const floor=new THREE.Mesh(new THREE.CircleGeometry(R+2,72),
-  new THREE.MeshStandardMaterial({map:terrazzo(),roughness:.35,metalness:.0,envMapIntensity:.6}));
-floor.rotation.x=-Math.PI/2;scene.add(floor);
-// blue runner rugs radiating out
-const rug=new THREE.MeshStandardMaterial({color:0x21366b,roughness:.95});
+// large grounding plane so the rotunda sits ON the land (not floating in the sky)
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(800,800),
+  new THREE.MeshStandardMaterial({color:0x9a9384,roughness:1,metalness:0}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-0.06;scene.add(ground);
+// rotunda terrazzo floor (sits 6cm above ground → no z-fighting)
+const floor=new THREE.Mesh(new THREE.CircleGeometry(R-0.3,72),
+  new THREE.MeshStandardMaterial({map:terrazzo(),roughness:.4,metalness:.0,envMapIntensity:.5}));
+floor.rotation.x=-Math.PI/2;floor.position.y=0;scene.add(floor);
+// blue runner rugs (raised + polygonOffset → kills the flicker/blinking)
+const rug=new THREE.MeshStandardMaterial({color:0x21366b,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
 for(let i=0;i<N;i++){const a=i*step;
-  const r=new THREE.Mesh(new THREE.PlaneGeometry(2.4,R-2),rug);
+  const r=new THREE.Mesh(new THREE.PlaneGeometry(2.2,R-3.5),rug);
   r.rotation.x=-Math.PI/2;r.rotation.z=-a;
-  r.position.set(Math.sin(a)*(R/2),0.01,Math.cos(a)*(R/2));scene.add(r);
+  r.position.set(Math.sin(a)*((R-1.5)/2),0.04,Math.cos(a)*((R-1.5)/2));scene.add(r);
 }
 
 /* ── CENTRE: stepped podium + urn + spheres ── */
@@ -181,15 +186,30 @@ const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,3,8),ironM);rod.po
 chand.position.set(0,WALL_H+1.2,0);scene.add(chand);
 const chLight=new THREE.PointLight(0xffe6b0,40,40,2);chLight.position.set(0,WALL_H,0);scene.add(chLight);
 
-/* ── art frames on the piers (placeholder until commerce port) ── */
-const frameMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.6});
-for(let i=0;i<N;i++){const a=(i+0.5)*step;
-  const fx=Math.sin(a)*(R-0.7), fz=Math.cos(a)*(R-0.7);
-  const f=new THREE.Mesh(new THREE.BoxGeometry(1.9,2.3,0.08),frameMat);
-  f.position.set(fx,3.0,fz);f.rotation.y=a+Math.PI;scene.add(f);
-  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.6,2.0),new THREE.MeshBasicMaterial({color:0xe9e9ea,toneMapped:false}));
-  c.position.set(Math.sin(a)*(R-0.74),3.0,Math.cos(a)*(R-0.74));c.rotation.y=a+Math.PI;scene.add(c);
+/* ── product display ring: white frames on the piers (filled from Shopify) ── */
+const frameMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.55});
+const artCanvases=[];
+for(let i=0;i<N;i++){const a=(i+0.5)*step, fr=R-0.7;
+  const f=new THREE.Mesh(new THREE.BoxGeometry(1.95,1.95,0.09),frameMat);
+  f.position.set(Math.sin(a)*fr,3.1,Math.cos(a)*fr);f.rotation.y=a+Math.PI;scene.add(f);
+  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.72,1.72),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
+  c.position.set(Math.sin(a)*(fr-0.05),3.1,Math.cos(a)*(fr-0.05));c.rotation.y=a+Math.PI;scene.add(c);
+  artCanvases.push(c);
 }
+/* live Shopify product images onto the ring */
+const SHOP={domain:'voulezvous-9945.myshopify.com',token:'6e0cf7b855cc8f3a88706494a6adfc93',ver:'2024-07'};
+(async()=>{
+  try{
+    const res=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',
+      headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},
+      body:JSON.stringify({query:'{products(first:30){nodes{title featuredImage{url}}}}'})});
+    const d=(await res.json()).data, prods=(d&&d.products&&d.products.nodes)||[];
+    const tl=new THREE.TextureLoader();tl.setCrossOrigin('anonymous');
+    prods.forEach((p,i)=>{const cv=artCanvases[i];if(!cv||!p.featuredImage)return;
+      tl.load(p.featuredImage.url,t=>{t.encoding=THREE.sRGBEncoding;cv.material=new THREE.MeshBasicMaterial({map:t,toneMapped:false});});
+    });
+  }catch(e){console.warn('[VV] product load failed',e);}
+})();
 
 /* ── ENTRANCE PORCH + BRANDING EASEL (you start here; the dome is ahead) ── */
 function brandBoardTex(){
@@ -221,10 +241,10 @@ function buildEasel(){
   return g;
 }
 // porch floor + low side walls extending out from the +Z entrance bay
-const porch=new THREE.Mesh(new THREE.BoxGeometry(6,0.4,8),stone);porch.position.set(0,-0.2,R+2.5);scene.add(porch);
-[-3,3].forEach(sx=>{const w=new THREE.Mesh(new THREE.BoxGeometry(0.45,2.4,8),wallMat);w.position.set(sx,1.2,R+2.5);scene.add(w);});
-// blue runner leading in
-const inRug=new THREE.Mesh(new THREE.PlaneGeometry(2.2,9),rug);inRug.rotation.x=-Math.PI/2;inRug.position.set(0,0.02,R+2.5);scene.add(inRug);
+const porch=new THREE.Mesh(new THREE.BoxGeometry(6,0.44,7),stone);porch.position.set(0,-0.18,R+3);scene.add(porch); // top at +0.04
+[-3,3].forEach(sx=>{const w=new THREE.Mesh(new THREE.BoxGeometry(0.45,2.4,7),wallMat);w.position.set(sx,1.2,R+3);scene.add(w);});
+// blue runner leading in (raised above porch top)
+const inRug=new THREE.Mesh(new THREE.PlaneGeometry(2.2,8),rug);inRug.rotation.x=-Math.PI/2;inRug.position.set(0,0.06,R+3);scene.add(inRug);
 // branding easel at the porch mouth
 const easel=buildEasel();easel.position.set(1.7,0,R+3.0);easel.rotation.y=0.3;scene.add(easel); // faces the entering visitor
 
