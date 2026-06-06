@@ -175,10 +175,10 @@ for(let i=0;i<3;i++){const a=i/3*Math.PI*2;const s=new THREE.Mesh(new THREE.Sphe
 /* ── PRODUCT DISPLAY: white frames on the INNER rotunda piers, facing OUT to the aisle ── */
 const frameMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.55});
 const artCanvases=[];
-for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN+0.56;   // outer face of the inner ring
-  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.09),frameMat);f.position.set(Math.sin(a)*fr,2.9,Math.cos(a)*fr);f.rotation.y=a;scene.add(f);
+for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.56;   // INNER face — facing the centre, seen from inside the dome
+  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.09),frameMat);f.position.set(Math.sin(a)*fr,2.9,Math.cos(a)*fr);f.rotation.y=a+Math.PI;scene.add(f);
   const c=new THREE.Mesh(new THREE.PlaneGeometry(1.32,1.32),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
-  c.position.set(Math.sin(a)*(fr+0.05),2.9,Math.cos(a)*(fr+0.05));c.rotation.y=a;scene.add(c);artCanvases.push(c);
+  c.position.set(Math.sin(a)*(fr-0.05),2.9,Math.cos(a)*(fr-0.05));c.rotation.y=a+Math.PI;scene.add(c);artCanvases.push(c);
 }
 /* live Shopify product images */
 const SHOP={domain:'voulezvous-9945.myshopify.com',token:'6e0cf7b855cc8f3a88706494a6adfc93',ver:'2024-07'};
