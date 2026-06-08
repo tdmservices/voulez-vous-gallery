@@ -2,6 +2,8 @@
 <!-- build: pass3 product card + black frames -->
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Voulez-Vous — Rotunda v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;box-sizing:border-box}html,body{height:100%;overflow:hidden;background:#0c0c0c;font-family:'Helvetica Neue',Arial,sans-serif}
 canvas{display:block}
@@ -12,23 +14,37 @@ canvas{display:block}
 #stick::before,#stickR::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
 #knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:radial-gradient(circle,#dcdcdc,#9a9a9a);border:1px solid rgba(255,255,255,.5)}
 #xh{position:fixed;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(201,168,74,.6);box-shadow:0 0 0 4px rgba(255,255,255,.18);pointer-events:none;z-index:9}
-/* ── loading overlay (previous-version style) ── */
-#load{position:fixed;inset:0;z-index:50;background:#ffffff;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#141414;transition:opacity 1.1s ease}
+/* ── loading + intro overlays (previous-version style) ── */
+#load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 38%,#171717 0%,#000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1.1s ease}
 #load.gone{opacity:0;pointer-events:none}
-#load .mono{width:108px;height:auto;margin-bottom:26px}
-#load .mono path{stroke-dasharray:240;stroke-dashoffset:240;animation:vvdraw 1.3s cubic-bezier(.66,0,.34,1) forwards}
-#load .mono path:nth-child(2){animation-delay:.3s}
-#load .mono path:nth-child(3){animation-delay:.62s}
-#load .wm{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:34px;letter-spacing:.015em;color:#141414;opacity:0;animation:fadeUp .9s ease .85s forwards}
-#load .tg{display:flex;align-items:center;justify-content:center;gap:12px;font-size:11px;letter-spacing:.4em;text-indent:.4em;color:#141414;margin:11px 0 0;opacity:0;animation:fadeUp .9s ease 1.1s forwards}
-#load .tg::before,#load .tg::after{content:'';width:26px;height:1px;background:#141414;opacity:.85}
-#load .bar{width:230px;height:2px;background:rgba(0,0,0,.1);position:relative;overflow:hidden;margin-top:46px;opacity:0;animation:fadeUp .8s ease 1.25s forwards}
-#load .bar i{position:absolute;inset-block:0;left:0;display:block;width:8%;background:linear-gradient(to right,#caa85a,#9a7f33);transition:width .12s linear}
-#load .bar i::after{content:'';position:absolute;top:0;right:0;width:34px;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,.7))}
-#load .pct{font-family:Georgia,serif;font-size:14px;letter-spacing:.08em;color:#7a756c;margin-top:15px;opacity:0;animation:fadeUp .8s ease 1.35s forwards}
-#load .st{font-size:9.5px;letter-spacing:.28em;color:#a39d92;margin-top:10px;text-transform:uppercase;min-height:13px;opacity:0;animation:fadeUp .8s ease 1.5s forwards}
+#load .mono{width:104px;height:auto;margin-bottom:26px}
+#load .mono path{stroke-dasharray:230;stroke-dashoffset:230;animation:vvdraw 1.3s cubic-bezier(.66,0,.34,1) forwards}
+#load .mono path:nth-child(2){animation-delay:.32s}
+#load .wm{font-family:'Josefin Sans','Helvetica Neue',sans-serif;font-weight:300;font-size:19px;letter-spacing:.5em;text-indent:.5em;color:#fff;opacity:0;animation:fadeUp .9s ease .85s forwards}
+#load .tg{display:flex;align-items:center;justify-content:center;gap:11px;font-size:9.5px;letter-spacing:.66em;text-indent:.66em;color:var(--gold);margin:12px 0 0;opacity:0;animation:fadeUp .9s ease 1.1s forwards}
+#load .tg::before,#load .tg::after{content:'';width:24px;height:1px;background:var(--gold);opacity:.6}
+#load .bar{width:230px;height:1px;background:rgba(255,255,255,.12);position:relative;overflow:hidden;margin-top:44px;opacity:0;animation:fadeUp .8s ease 1.25s forwards}
+#load .bar i{position:absolute;inset-block:0;left:0;display:block;width:8%;background:linear-gradient(to right,var(--gold),#fff);transition:width .12s linear}
+#load .bar i::after{content:'';position:absolute;top:0;right:0;width:34px;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,.85))}
+#load .pct{font-size:9px;letter-spacing:.5em;text-indent:.5em;color:rgba(255,255,255,.42);margin-top:14px;opacity:0;animation:fadeUp .8s ease 1.35s forwards}
+#load .st{font-size:8.5px;letter-spacing:.3em;color:#7d7768;margin-top:9px;text-transform:uppercase;min-height:12px;opacity:0;animation:fadeUp .8s ease 1.5s forwards}
+#intro{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 40%,#151515,#000 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 1s ease;color:#fff}
+#intro.show{opacity:1;pointer-events:auto}
+#intro .mono{width:116px;height:auto;animation:floaty 5.5s ease-in-out infinite}
+#intro .i-name{font-family:'Josefin Sans','Helvetica Neue',sans-serif;font-size:22px;letter-spacing:.5em;color:#fff;font-weight:300;margin-top:22px;text-indent:.5em}
+#intro .i-tag{display:flex;align-items:center;gap:11px;font-size:10px;letter-spacing:.72em;color:var(--gold);margin-top:10px;text-indent:.72em}
+#intro .i-tag::before,#intro .i-tag::after{content:'';width:26px;height:1px;background:var(--gold);opacity:.55}
+#intro .i-sep{width:1px;height:52px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:30px auto;opacity:.55}
+#intro .i-hints{font-size:10px;letter-spacing:.32em;color:rgba(255,255,255,.5);line-height:3;text-align:center;text-transform:uppercase}
+#intro .i-hints b{color:#fff;font-weight:400}
+#intro .i-btn{margin-top:34px;padding:15px 56px;border:1px solid rgba(255,255,255,.32);background:transparent;color:#fff;font-family:'Josefin Sans','Helvetica Neue',sans-serif;font-size:11px;letter-spacing:.5em;text-transform:uppercase;text-indent:.5em;cursor:pointer;border-radius:2px;position:relative;overflow:hidden;transition:color .4s,border-color .4s}
+#intro .i-btn span{position:relative;z-index:1}
+#intro .i-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--gold),#e0c267);transform:scaleX(0);transform-origin:left;transition:transform .42s cubic-bezier(.66,0,.34,1)}
+#intro .i-btn:hover::before{transform:scaleX(1)}
+#intro .i-btn:hover{color:#111;border-color:#e0c267}
 @keyframes vvdraw{to{stroke-dashoffset:0}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 #enter{margin-top:30px;padding:14px 40px;background:transparent;color:var(--gold);border:1px solid var(--gold);letter-spacing:.32em;font-size:12px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:.35s;opacity:0;pointer-events:none}
 #enter.on{opacity:1;pointer-events:auto}
 #enter:hover{background:var(--gold);color:#111}
@@ -62,16 +78,28 @@ canvas{display:block}
   </div>
 </div>
 <div id="load">
-  <svg class="mono" viewBox="0 0 132 104" fill="none" stroke="#141414" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
-    <path d="M12 8 L52 96 L66 24" stroke-width="13"/>
-    <path d="M120 8 L80 96 L66 24" stroke-width="13"/>
-    <path d="M66 28 L66 5" stroke-width="6"/>
+  <svg class="mono" viewBox="0 0 120 90" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M18 8 L46 80 L74 8"/><path d="M46 8 L74 80 L102 8"/>
   </svg>
   <div class="wm">Voulez-Vous</div>
-  <div class="tg">BORN TO WIN</div>
+  <div class="tg">Born To Win</div>
   <div class="bar"><i id="barfill"></i></div>
   <div class="pct" id="pct">0%</div>
   <div class="st" id="lstat">Preparing the gallery…</div>
+</div>
+<div id="intro">
+  <svg class="mono" viewBox="0 0 120 90" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M18 8 L46 80 L74 8"/><path d="M46 8 L74 80 L102 8"/>
+  </svg>
+  <div class="i-name">Voulez-Vous</div>
+  <div class="i-tag">Born To Win</div>
+  <div class="i-sep"></div>
+  <div class="i-hints">
+    <b>WASD / Joystick</b> &nbsp;·&nbsp; Walk<br>
+    <b>Drag / Right stick</b> &nbsp;·&nbsp; Look around<br>
+    <b>Tap</b> &nbsp;·&nbsp; View piece
+  </div>
+  <button class="i-btn" id="enterBtn"><span>Enter the Gallery</span></button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/3d/RGBELoader.js"></script>
@@ -134,11 +162,13 @@ addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.a
 const barfill=document.getElementById('barfill'),lstat=document.getElementById('lstat'),pct=document.getElementById('pct');
 let targetP=0,shownP=0,autoStarted=false;
 function setProg(p,msg){targetP=Math.max(targetP,p);if(msg)lstat.textContent=msg;}
-function autoEnter(){if(autoStarted)return;autoStarted=true;lstat.textContent='Welcome';setTimeout(()=>{document.getElementById('load').classList.add('gone');entered=true;},650);} // auto-enter at 100% — no button to click
+function showIntro(){if(autoStarted)return;autoStarted=true;lstat.textContent='Welcome';
+  const load=document.getElementById('load'),intro=document.getElementById('intro');
+  setTimeout(()=>{load.classList.add('gone');setTimeout(()=>{load.style.display='none';intro.classList.add('show');},1100);},350);}
 const loadTimer=setInterval(()=>{
   shownP+=Math.min(1.2,Math.max(0.4,(targetP-shownP)*0.06));if(shownP>targetP)shownP=targetP; // paced so the intro animation breathes (~2.5s min)
   barfill.style.width=shownP+'%';pct.textContent=Math.round(shownP)+'%';
-  if(shownP>=99.5){clearInterval(loadTimer);barfill.style.width='100%';pct.textContent='100%';autoEnter();}
+  if(shownP>=99.5){clearInterval(loadTimer);barfill.style.width='100%';pct.textContent='100%';showIntro();}
 },30);
 setProg(22,'Loading environment…');
 setTimeout(()=>setProg(100),7000); // safety: never trap the user on the loader
@@ -446,7 +476,11 @@ function brandTex(){
 scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.62));
 const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun);
 
-/* ── entry is automatic once loading hits 100% (see autoEnter) ── */
+/* ── intro "Enter the Gallery" button → begin the fly-in ── */
+document.getElementById('enterBtn').addEventListener('click',()=>{
+  const intro=document.getElementById('intro');intro.style.opacity='0';intro.style.pointerEvents='none';
+  setTimeout(()=>{intro.style.display='none';entered=true;},650);
+});
 
 /* ── render loop ── */
 const clock=new THREE.Clock();
