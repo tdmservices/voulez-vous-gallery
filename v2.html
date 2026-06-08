@@ -85,8 +85,8 @@ const N_OUT=14, N_IN=16;
 const stepO=Math.PI*2/N_OUT, stepI=Math.PI*2/N_IN;
 
 /* ── camera poses: cinematic fly-in start → eye-level spawn ── */
-const camStart={pos:new THREE.Vector3(0,9.2,R_OUT+12),yaw:-0.05,pitch:-0.34};
-const camEnd  ={pos:new THREE.Vector3(0,2.0,R_OUT+3.5),yaw:-0.28,pitch:-0.02};
+const camStart={pos:new THREE.Vector3(0,9.4,R_OUT+11),yaw:-0.04,pitch:-0.36};
+const camEnd  ={pos:new THREE.Vector3(0,2.0,R_OUT-2.8),yaw:-0.12,pitch:-0.02}; // land just inside the entrance, gallery opening ahead
 let yaw=camStart.yaw,pitch=camStart.pitch;
 camera.position.copy(camStart.pos);
 let entered=false,flyT=0;
@@ -110,7 +110,7 @@ function makeStick(el,knob,t){
 const resetMove=makeStick(document.getElementById('stick'),document.getElementById('knob'),move);
 const resetLook=makeStick(document.getElementById('stickR'),document.getElementById('knobR'),look);
 addEventListener('blur',()=>{resetMove();resetLook();});
-function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;return Math.abs(x)<2.6&&z>0&&z<R_OUT+6.5;}
+function allowed(x,z){const r=Math.hypot(x,z);return r<R_OUT-0.8&&r>1.5;} // walk inside the rotunda; the terrace beyond the arches is railed off
 
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 
@@ -232,11 +232,40 @@ function floorTex(){
 }
 // SEA — calm muted slate water (desaturated → on-brand, still reads as sea)
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshStandardMaterial({color:0x223a44,roughness:.32,metalness:.1,envMapIntensity:.5}));
-sea.rotation.x=-Math.PI/2;sea.position.y=-0.18;scene.add(sea);
+sea.rotation.x=-Math.PI/2;sea.position.y=-0.62;scene.add(sea);
 const floor=new THREE.Mesh(new THREE.CircleGeometry(R_OUT,96),new THREE.MeshStandardMaterial({map:floorTex(),roughness:.5,metalness:0,envMapIntensity:.4,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
 floor.rotation.x=-Math.PI/2;floor.position.y=0;scene.add(floor);
-const fascia=new THREE.Mesh(new THREE.CylinderGeometry(R_OUT,R_OUT,0.2,96,1,true),new THREE.MeshStandardMaterial({color:IVORY,roughness:.85,metalness:0,side:THREE.DoubleSide,envMapIntensity:.5}));
-fascia.position.y=-0.1;scene.add(fascia);
+
+// ── SEASIDE TERRACE + classical balustrade ring (the reference look: railed terrace over the sea, seen through every arch) ──
+(function terrace(){
+  const RB=R_OUT+2.45;
+  const cobble=new THREE.MeshStandardMaterial({color:0xbfb9ac,roughness:.97,metalness:0,envMapIntensity:.45});
+  const railW =new THREE.MeshStandardMaterial({color:0xe9e4d8,roughness:.7,metalness:0,envMapIntensity:.6});
+  const plinthD=new THREE.MeshStandardMaterial({color:0x2a2926,roughness:.92});
+  // stone terrace floor ring, flush with the interior floor
+  const terr=new THREE.Mesh(new THREE.RingGeometry(R_OUT-0.2,RB+0.3,90),cobble);terr.rotation.x=-Math.PI/2;terr.position.y=0.004;scene.add(terr);
+  // dark plinth band at the terrace edge + cliff down to the water
+  const plinth=new THREE.Mesh(new THREE.CylinderGeometry(RB+0.3,RB+0.3,0.55,104,1,true),plinthD);plinth.position.y=0.275;plinth.material.side=THREE.DoubleSide;scene.add(plinth);
+  const cliff =new THREE.Mesh(new THREE.CylinderGeometry(RB+0.3,RB+0.3,1.4,104,1,true),plinthD);cliff.position.y=-0.7;cliff.material.side=THREE.DoubleSide;scene.add(cliff);
+  // white stone cap on the plinth
+  const cap=new THREE.Mesh(new THREE.TorusGeometry(RB+0.3,0.07,8,104),railW);cap.rotation.x=Math.PI/2;cap.position.y=0.57;scene.add(cap);
+  // turned balusters (instanced) standing on the cap
+  const prof=[];for(let i=0;i<=12;i++){const t=i/12;prof.push(new THREE.Vector2(Math.max(0.035,0.055+Math.sin(t*Math.PI)*0.05),t*0.6));}
+  const balGeo=new THREE.LatheGeometry(prof,10);
+  const count=Math.round(2*Math.PI*(RB+0.3)/0.58);
+  const inst=new THREE.InstancedMesh(balGeo,railW,count);const d=new THREE.Object3D();
+  for(let i=0;i<count;i++){const a=i/count*Math.PI*2;d.position.set(Math.sin(a)*(RB+0.3),0.6,Math.cos(a)*(RB+0.3));d.updateMatrix();inst.setMatrixAt(i,d.matrix);}
+  inst.instanceMatrix.needsUpdate=true;scene.add(inst);
+  // white handrail across the top of the balusters
+  const hand=new THREE.Mesh(new THREE.TorusGeometry(RB+0.3,0.08,8,104),railW);hand.rotation.x=Math.PI/2;hand.position.y=1.22;scene.add(hand);
+  // classical urns flanking the entrance on the terrace
+  const urnM=new THREE.MeshStandardMaterial({color:0xd2cab6,roughness:.85,metalness:.05,envMapIntensity:.55}); // pale stone urn → reads against the sea
+  const up=[];for(let i=0;i<=10;i++){const t=i/10;up.push(new THREE.Vector2(Math.sin(t*Math.PI*0.95)*0.34*(1-t*0.2)+0.06,t*1.05));}
+  const ug=new THREE.LatheGeometry(up,28);
+  [[-2.6,R_OUT+1.1],[2.6,R_OUT+1.1]].forEach(([ux,uz])=>{const u=new THREE.Mesh(ug,urnM);u.position.set(ux,0.04,uz);scene.add(u);
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.36,0.42,0.16,18),railW);b.position.set(ux,0.08,uz);scene.add(b);
+    const gb=new THREE.Mesh(new THREE.TorusGeometry(0.27,0.025,6,24),goldMat);gb.rotation.x=Math.PI/2;gb.position.set(ux,0.62,uz);scene.add(gb);});
+})();
 
 /* ── CENTRE: stepped podium + black-onyx urn + marble spheres (slowly turning) ── */
 const podium=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.7,0.5,40),stone);podium.position.y=0.25;scene.add(podium);
@@ -302,11 +331,9 @@ function brandTex(){
   x.fillStyle='#b08d3c';x.font='600 22px Arial';x.fillText('STEP INTO THE GALLERY',cx,560);
   const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;return t;
 }
-(function walkway(){
-  const deck=new THREE.Mesh(new THREE.BoxGeometry(4.4,0.34,9),new THREE.MeshStandardMaterial({color:IVORY,roughness:.85,metalness:0,envMapIntensity:.5}));deck.position.set(0,-0.16,R_OUT+3);scene.add(deck);
-  const runner=new THREE.Mesh(new THREE.PlaneGeometry(2.2,9),new THREE.MeshStandardMaterial({color:0x161514,roughness:.8,metalness:0,envMapIntensity:.3,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));runner.rotation.x=-Math.PI/2;runner.position.set(0,0.012,R_OUT+3);scene.add(runner);
-  // thin gold edge lines on the runner
-  [-1.12,1.12].forEach(sx=>{const e=new THREE.Mesh(new THREE.PlaneGeometry(0.05,9),new THREE.MeshStandardMaterial({color:GOLD,metalness:.9,roughness:.35,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));e.rotation.x=-Math.PI/2;e.position.set(sx,0.014,R_OUT+3);scene.add(e);});
+(function entranceRug(){ // black rug with a gold border at the entrance threshold (inside)
+  const gb=new THREE.Mesh(new THREE.PlaneGeometry(3.7,4.9),new THREE.MeshStandardMaterial({color:GOLD,metalness:.85,roughness:.4,envMapIntensity:.8,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));gb.rotation.x=-Math.PI/2;gb.position.set(0,0.011,R_OUT-3.4);scene.add(gb);
+  const rug=new THREE.Mesh(new THREE.PlaneGeometry(3.35,4.55),new THREE.MeshStandardMaterial({color:0x141312,roughness:.85,metalness:0,envMapIntensity:.25,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.013,R_OUT-3.4);scene.add(rug);
 })();
 (function easel(){const g=new THREE.Group();const wood=new THREE.MeshStandardMaterial({color:0x4a3a26,roughness:.7});
   const board=new THREE.Mesh(new THREE.BoxGeometry(1.55,2.0,0.07),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.5}));board.position.set(0,2.0,0);board.rotation.x=-0.07;g.add(board);
@@ -314,7 +341,7 @@ function brandTex(){
   const lg=new THREE.CylinderGeometry(0.045,0.045,3.0,8);
   [[-0.62,0.11,0],[0.62,-0.11,0]].forEach(([x,rz])=>{const l=new THREE.Mesh(lg,wood);l.position.set(x,1.3,0.1);l.rotation.z=rz;g.add(l);});
   const l3=new THREE.Mesh(lg,wood);l3.position.set(0,1.3,-0.55);l3.rotation.x=0.28;g.add(l3);
-  g.position.set(2.0,0,R_OUT+1.3);g.rotation.y=-0.32;scene.add(g);})();
+  g.position.set(3.0,0,R_OUT-3.0);g.rotation.y=-0.5;scene.add(g);})(); // welcome easel just inside the entrance, to the side
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.62));
 const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun);
