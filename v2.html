@@ -6,9 +6,13 @@
 canvas{display:block}
 :root{--gold:#c9a84a}
 #hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);color:#cbb88a;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;background:rgba(12,12,12,.42);padding:6px 14px;border-radius:20px;pointer-events:none;z-index:9;border:1px solid rgba(201,168,74,.25)}
-#stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(201,168,74,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10}
-#stick{left:26px}#stickR{right:26px}
-#knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:rgba(201,168,74,.5);border:1px solid rgba(255,255,255,.4)}
+#stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10}
+#stickR{right:26px;background:rgba(255,255,255,.07);border:1px solid rgba(201,168,74,.3)}
+#stick{left:26px;background:radial-gradient(circle,#9b9b9b 0%,#6b6b6b 100%);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 0 14px rgba(0,0,0,.35)}
+#stick::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
+#knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%}
+#knobR{background:rgba(201,168,74,.5);border:1px solid rgba(255,255,255,.4)}
+#knob{background:radial-gradient(circle,#dcdcdc,#9a9a9a);border:1px solid rgba(255,255,255,.5)}
 #xh{position:fixed;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(201,168,74,.6);box-shadow:0 0 0 4px rgba(255,255,255,.18);pointer-events:none;z-index:9}
 /* ── loading / intro overlay ── */
 #load{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 38%,#1a1a1a 0%,#0a0a0a 75%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1s ease}
@@ -18,7 +22,8 @@ canvas{display:block}
 #load .tg{font-size:13px;letter-spacing:.5em;color:var(--gold);margin:10px 0 34px;padding-left:.5em}
 #load .bar{width:230px;height:2px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden}
 #load .bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,#9a7f33,var(--gold));transition:width .5s ease}
-#load .st{font-size:10.5px;letter-spacing:.28em;color:#9b937f;margin-top:16px;text-transform:uppercase;min-height:14px}
+#load .pct{font-family:Georgia,serif;font-size:15px;color:var(--gold);margin-top:11px;letter-spacing:.08em}
+#load .st{font-size:10.5px;letter-spacing:.28em;color:#9b937f;margin-top:9px;text-transform:uppercase;min-height:14px}
 #enter{margin-top:30px;padding:14px 40px;background:transparent;color:var(--gold);border:1px solid var(--gold);letter-spacing:.32em;font-size:12px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:.35s;opacity:0;pointer-events:none}
 #enter.on{opacity:1;pointer-events:auto}
 #enter:hover{background:var(--gold);color:#111}
@@ -54,8 +59,8 @@ canvas{display:block}
   <div class="wm">Voulez-Vous</div>
   <div class="tg">BORN&nbsp;&nbsp;TO&nbsp;&nbsp;WIN</div>
   <div class="bar"><i id="barfill"></i></div>
+  <div class="pct" id="pct">0%</div>
   <div class="st" id="lstat">Preparing the gallery…</div>
-  <button id="enter">Enter the Gallery</button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/3d/RGBELoader.js"></script>
@@ -115,9 +120,15 @@ function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 
 /* ── loading progress ── */
-const barfill=document.getElementById('barfill'),lstat=document.getElementById('lstat'),enterBtn=document.getElementById('enter');
-let prog=0;function setProg(p,msg){prog=Math.max(prog,p);barfill.style.width=prog+'%';if(msg)lstat.textContent=msg;if(prog>=100)ready();}
-let isReady=false;function ready(){if(isReady)return;isReady=true;lstat.textContent='The gallery awaits';enterBtn.classList.add('on');}
+const barfill=document.getElementById('barfill'),lstat=document.getElementById('lstat'),pct=document.getElementById('pct');
+let targetP=0,shownP=0,autoStarted=false;
+function setProg(p,msg){targetP=Math.max(targetP,p);if(msg)lstat.textContent=msg;}
+function autoEnter(){if(autoStarted)return;autoStarted=true;lstat.textContent='Welcome';setTimeout(()=>{document.getElementById('load').classList.add('gone');entered=true;},650);} // auto-enter at 100% — no button to click
+const loadTimer=setInterval(()=>{
+  shownP+=Math.max(0.5,(targetP-shownP)*0.07);if(shownP>targetP)shownP=targetP;
+  barfill.style.width=shownP+'%';pct.textContent=Math.round(shownP)+'%';
+  if(shownP>=99.5){clearInterval(loadTimer);barfill.style.width='100%';pct.textContent='100%';autoEnter();}
+},30);
 setProg(22,'Loading environment…');
 setTimeout(()=>setProg(100),7000); // safety: never trap the user on the loader
 
@@ -201,14 +212,14 @@ for(let i=0;i<NA;i++){const a=i/NA*Math.PI*2,cx=Math.cos(a),cz=Math.sin(a);
   const candle=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.22,8),candleM);candle.position.set(cx*Rring,0.58,cz*Rring);chand.add(candle);
   const flame=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),flameM);flame.position.set(cx*Rring,0.75,cz*Rring);chand.add(flame);
 }
-const tiers=9;
-for(let t=0;t<tiers;t++){const f=t/(tiers-1),r=Rring*(1-f*0.93),y=0.22-f*1.85,beads=Math.max(6,Math.round(r*15));
-  for(let i=0;i<beads;i++){const a=(i+(t%2)*0.5)/beads*Math.PI*2;
-    const b=new THREE.Mesh(new THREE.OctahedronGeometry(0.07,0),crystal);b.position.set(Math.cos(a)*r,y,Math.sin(a)*r);b.rotation.y=a;chand.add(b);}
-}
-const drop=new THREE.Mesh(new THREE.OctahedronGeometry(0.18,0),crystal);drop.position.y=-1.75;chand.add(drop);
-const upRing=new THREE.Mesh(new THREE.TorusGeometry(1.05,0.045,8,48),frameG);upRing.rotation.x=Math.PI/2;upRing.position.y=0.66;chand.add(upRing);
-for(let i=0;i<14;i++){const a=i/14*Math.PI*2;const b=new THREE.Mesh(new THREE.OctahedronGeometry(0.06,0),crystal);b.position.set(Math.cos(a)*1.05,0.74,Math.sin(a)*1.05);chand.add(b);}
+// neat crystal drop-strands hanging under each candle arm (no scattered glitter)
+for(let i=0;i<NA;i++){const a=i/NA*Math.PI*2,cx=Math.cos(a),cz=Math.sin(a);
+  for(let s=0;s<3;s++){const dr=new THREE.Mesh(new THREE.OctahedronGeometry(0.055-s*0.008,0),crystal);dr.position.set(cx*Rring,0.28-s*0.17,cz*Rring);chand.add(dr);}}
+// draped crystal swag below the main ring + central finial
+const swag=new THREE.Mesh(new THREE.TorusGeometry(1.12,0.04,8,48),frameG);swag.rotation.x=Math.PI/2;swag.position.y=0.0;chand.add(swag);
+for(let i=0;i<26;i++){const a=i/26*Math.PI*2;const b=new THREE.Mesh(new THREE.OctahedronGeometry(0.05,0),crystal);b.position.set(Math.cos(a)*1.12,-0.02-Math.abs(Math.sin(i*1.9))*0.14,Math.sin(a)*1.12);chand.add(b);}
+const fcap=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.05,0.34,12),frameG);fcap.position.y=-0.42;chand.add(fcap);
+const finial=new THREE.Mesh(new THREE.OctahedronGeometry(0.17,0),crystal);finial.position.y=-0.72;chand.add(finial);
 chand.scale.setScalar(1.85);chand.position.set(0,H+1.7,0);scene.add(chand);
 const chLight=new THREE.PointLight(0xffe9bd,58,55,2);chLight.position.set(0,H+1,0);scene.add(chLight);
 
@@ -253,16 +264,16 @@ const path=new THREE.Mesh(new THREE.PlaneGeometry(3.2,R_OUT-R_IN+1.8),new THREE.
 path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(path);
 // ── DISPLAY VASES in the outer gallery (spaced along the wall, things to look at) ──
 (function galleryVases(){
-  const stoneV=new THREE.MeshStandardMaterial({color:0xd2cab6,roughness:.8,metalness:.05,envMapIntensity:.5});
-  const onyxV =new THREE.MeshStandardMaterial({color:0x161616,roughness:.3,metalness:.4,envMapIntensity:.75});
-  const profs=[(t)=>Math.sin(t*Math.PI*0.9)*0.3*(1-t*0.1)+0.08,(t)=>Math.sin(t*Math.PI)*0.38+0.07,(t)=>0.1+t*0.3];
-  const heights=[1.25,0.92,1.05];
+  // ONE design, golden-brown / caramel, large — like the reference
+  const caramel=new THREE.MeshStandardMaterial({color:0xa9763c,roughness:.62,metalness:.18,envMapIntensity:.6});
+  const VH=1.85; // big amphora
+  const pts=[];for(let j=0;j<=14;j++){const t=j/14;pts.push(new THREE.Vector2(Math.max(0.05,Math.sin(t*Math.PI*0.94)*0.46*(1-t*0.12)+0.09),t*VH));}
+  const vg=new THREE.LatheGeometry(pts,28);
   for(let i=0;i<N_OUT;i++){ if(i%2)continue; const a=(i+0.5)*stepO; if(Math.min(a,Math.PI*2-a)<0.5)continue; // every other pier, skip entrance
-    const rr=R_OUT-1.5, sx=Math.sin(a)*rr, sz=Math.cos(a)*rr, k=(i/2)%3;
-    const pts=[];for(let j=0;j<=12;j++){const t=j/12;pts.push(new THREE.Vector2(Math.max(0.04,profs[k](t)),t*heights[k]));}
-    const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.48,0.34,20),stone);ped.position.set(sx,0.17,sz);scene.add(ped);
-    const v=new THREE.Mesh(new THREE.LatheGeometry(pts,24),(i/2)%2?stoneV:onyxV);v.position.set(sx,0.34,sz);scene.add(v);
-    const gr=new THREE.Mesh(new THREE.TorusGeometry(0.29,0.02,6,20),goldMat);gr.rotation.x=Math.PI/2;gr.position.set(sx,0.52,sz);scene.add(gr);
+    const rr=R_OUT-1.5, sx=Math.sin(a)*rr, sz=Math.cos(a)*rr;
+    const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.56,0.34,20),stone);ped.position.set(sx,0.17,sz);scene.add(ped);
+    const v=new THREE.Mesh(vg,caramel);v.position.set(sx,0.34,sz);scene.add(v);
+    const gr=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.022,6,22),goldMat);gr.rotation.x=Math.PI/2;gr.position.set(sx,0.62,sz);scene.add(gr);
   }
 })();
 
@@ -302,40 +313,43 @@ path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(p
   for(let i=1;i<nb;i++){const bx=-GW/2+i*(GW/nb);
     const bar=new THREE.Mesh(new THREE.CylinderGeometry(0.026,0.026,GH-0.16,8),gate);bar.position.set(bx,0.16+(GH-0.16)/2,gz);scene.add(bar);
     const sp=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.13,8),gate);sp.position.set(bx,GH+0.07,gz);scene.add(sp);}
-  // pale-stone urns flanking the entrance on the landing
-  const urnM=new THREE.MeshStandardMaterial({color:0xd2cab6,roughness:.85,metalness:.05,envMapIntensity:.55});
-  const up=[];for(let i=0;i<=10;i++){const t=i/10;up.push(new THREE.Vector2(Math.sin(t*Math.PI*0.95)*0.34*(1-t*0.2)+0.06,t*1.05));}
+  // caramel urns flanking the entrance (same design as the gallery vases)
+  const urnM=new THREE.MeshStandardMaterial({color:0xa9763c,roughness:.62,metalness:.18,envMapIntensity:.6});
+  const up=[];for(let i=0;i<=14;i++){const t=i/14;up.push(new THREE.Vector2(Math.max(0.05,Math.sin(t*Math.PI*0.94)*0.46*(1-t*0.12)+0.09),t*1.85));}
   const ug=new THREE.LatheGeometry(up,28);
-  [[-1.55,R_OUT+0.2],[1.55,R_OUT+0.2]].forEach(([ux,uz])=>{const u=new THREE.Mesh(ug,urnM);u.position.set(ux,0.05,uz);scene.add(u);
-    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.36,0.42,0.16,18),railW);b.position.set(ux,0.09,uz);scene.add(b);
-    const gb=new THREE.Mesh(new THREE.TorusGeometry(0.27,0.025,6,24),goldMat);gb.rotation.x=Math.PI/2;gb.position.set(ux,0.63,uz);scene.add(gb);});
+  [[-1.85,R_OUT+0.2],[1.85,R_OUT+0.2]].forEach(([ux,uz])=>{const u=new THREE.Mesh(ug,urnM);u.position.set(ux,0.34,uz);scene.add(u);
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.56,0.34,20),stone);b.position.set(ux,0.17,uz);scene.add(b);
+    const gb=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.022,6,22),goldMat);gb.rotation.x=Math.PI/2;gb.position.set(ux,0.62,uz);scene.add(gb);});
 })();
 
-/* ── CENTRE: stepped podium + black-onyx urn + marble spheres (slowly turning) ── */
-const podium=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.7,0.5,40),stone);podium.position.y=0.25;scene.add(podium);
-const podRing=new THREE.Mesh(new THREE.TorusGeometry(2.42,0.05,8,48),goldMat);podRing.rotation.x=Math.PI/2;podRing.position.y=0.5;scene.add(podRing);
-const pts=[];for(let i=0;i<=14;i++){const t=i/14;pts.push(new THREE.Vector2(Math.sin(t*Math.PI*0.92)*0.78*(1-t*0.15)+0.12,t*2.5));}
-const urn=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshStandardMaterial({color:0x161616,roughness:.26,metalness:.4,envMapIntensity:.8}));urn.position.y=0.5;scene.add(urn);
-const urnBand=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.035,8,40),goldMat);urnBand.rotation.x=Math.PI/2;urnBand.position.y=1.0;scene.add(urnBand);
-const orbit=new THREE.Group();orbit.position.y=0.5;scene.add(orbit);
-const sphMat=new THREE.MeshStandardMaterial({color:WHITE,roughness:.55});
-for(let i=0;i<3;i++){const a=i/3*Math.PI*2;const s=new THREE.Mesh(new THREE.SphereGeometry(0.4,24,24),i===1?goldMat:sphMat);s.position.set(Math.sin(a)*1.6,0.4,Math.cos(a)*1.6);orbit.add(s);}
-
-/* ── floating gold dust ── */
-const dustN=300,dustGeo=new THREE.BufferGeometry(),dustPos=new Float32Array(dustN*3);
-for(let i=0;i<dustN;i++){const r=Math.random()*R_IN*1.05,a=Math.random()*6.28;dustPos[i*3]=Math.cos(a)*r;dustPos[i*3+1]=0.4+Math.random()*6.5;dustPos[i*3+2]=Math.sin(a)*r;}
-dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
-const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xd9bd71,size:0.055,transparent:true,opacity:.65,depthWrite:false,sizeAttenuation:true}));scene.add(dust);
+/* ── CENTRE: glass/mirror stage + faceted black rock with gold veins + 4 spiral light-yellow accents ── */
+// reflective glass / mirror stage
+const stageBase=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.7,0.35,48),new THREE.MeshStandardMaterial({color:0x101010,roughness:.4,metalness:.5,envMapIntensity:.8}));stageBase.position.y=0.175;scene.add(stageBase);
+const mirror=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.06,48),new THREE.MeshStandardMaterial({color:0x0b0b0d,roughness:.04,metalness:1,envMapIntensity:1.8}));mirror.position.y=0.37;scene.add(mirror); // glass/mirror top reflecting the dome
+const stageRing=new THREE.Mesh(new THREE.TorusGeometry(2.42,0.045,8,56),goldMat);stageRing.rotation.x=Math.PI/2;stageRing.position.y=0.4;scene.add(stageRing);
+// faceted black rock with gold veins (matches the brand: black + gold lines)
+const rockGroup=new THREE.Group();rockGroup.position.y=0.4;scene.add(rockGroup);
+const rockGeo=new THREE.IcosahedronGeometry(1.35,1);rockGeo.scale(0.82,1.32,0.82);
+const rock=new THREE.Mesh(rockGeo,new THREE.MeshStandardMaterial({color:0x121212,roughness:.34,metalness:.35,envMapIntensity:.9,flatShading:true}));rock.position.y=1.45;rockGroup.add(rock);
+const veins=new THREE.LineSegments(new THREE.EdgesGeometry(rockGeo),new THREE.LineBasicMaterial({color:GOLD}));veins.position.y=1.45;rockGroup.add(veins); // gold crack-lines along the facets
+// 4 spiral light-yellow objects supporting it
+const spiralGroup=new THREE.Group();spiralGroup.position.y=0.4;scene.add(spiralGroup);
+const spiralMat=new THREE.MeshStandardMaterial({color:0xf2e6a6,roughness:.35,metalness:.2,envMapIntensity:.9});
+for(let q=0;q<4;q++){const a=q/4*Math.PI*2+Math.PI/4;
+  const ppts=[];for(let s=0;s<=60;s++){const u=s/60,ang=u*Math.PI*5,rad=0.18*(1-u*0.55);ppts.push(new THREE.Vector3(Math.cos(ang)*rad,u*1.5,Math.sin(ang)*rad));}
+  const sp=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ppts),64,0.045,8,false),spiralMat);
+  sp.position.set(Math.sin(a)*1.55,0.02,Math.cos(a)*1.55);spiralGroup.add(sp);}
 
 /* ── PRODUCT FRAMES on inner piers (face the centre) ── */
 const frameMat=new THREE.MeshStandardMaterial({color:WHITE,roughness:.5});
 const goldFrameMat=new THREE.MeshStandardMaterial({color:GOLD,roughness:.35,metalness:.9,envMapIntensity:1.1});
 const artCanvases=[],picks=[];
+const PROD_Y=2.05; // lower, natural eye-level height (was too high — felt out of reach)
 for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.56;
-  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.09),frameMat);f.position.set(Math.sin(a)*fr,2.9,Math.cos(a)*fr);f.rotation.y=a+Math.PI;scene.add(f);
+  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.09),frameMat);f.position.set(Math.sin(a)*fr,PROD_Y,Math.cos(a)*fr);f.rotation.y=a+Math.PI;scene.add(f);
   const trim=new THREE.Mesh(new THREE.TorusGeometry(0.86,0.025,6,4),goldFrameMat);trim.position.copy(f.position);trim.rotation.y=a+Math.PI;trim.rotation.z=Math.PI/4;scene.add(trim);
   const c=new THREE.Mesh(new THREE.PlaneGeometry(1.32,1.32),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
-  c.position.set(Math.sin(a)*(fr-0.05),2.9,Math.cos(a)*(fr-0.05));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f);f.userData.idx=i;
+  c.position.set(Math.sin(a)*(fr-0.05),PROD_Y,Math.cos(a)*(fr-0.05));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f);f.userData.idx=i;
 }
 /* live Shopify catalogue */
 const SHOP={domain:'voulezvous-9945.myshopify.com',token:'6e0cf7b855cc8f3a88706494a6adfc93',ver:'2024-07'};
@@ -390,11 +404,7 @@ function brandTex(){
 scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.62));
 const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun);
 
-/* ── ENTER button → fly-in ── */
-enterBtn.addEventListener('click',()=>{
-  document.getElementById('load').classList.add('gone');
-  entered=true;
-});
+/* ── entry is automatic once loading hits 100% (see autoEnter) ── */
 
 /* ── render loop ── */
 const clock=new THREE.Clock();
@@ -403,9 +413,7 @@ function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime,spd=4.6;
   // ── always-on ambient motion ──
-  for(let i=0;i<dustN;i++){let y=dustPos[i*3+1]+dt*0.12;if(y>6.9)y=0.4;dustPos[i*3+1]=y;}
-  dustGeo.attributes.position.needsUpdate=true;dust.rotation.y=t*0.01;
-  urn.rotation.y=t*0.12;orbit.rotation.y=t*0.3;
+  rockGroup.rotation.y=t*0.12;spiralGroup.rotation.y=-t*0.25;
   chand.rotation.y=t*0.045;chand.rotation.z=Math.sin(t*0.55)*0.014;
   chLight.intensity=56+Math.sin(t*4.7)*7;flameM.emissiveIntensity=2.2+Math.sin(t*11)*0.45;
 
