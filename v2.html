@@ -86,7 +86,7 @@ const stepO=Math.PI*2/N_OUT, stepI=Math.PI*2/N_IN;
 
 /* ── camera poses: cinematic fly-in start → eye-level spawn ── */
 const camStart={pos:new THREE.Vector3(0,9.4,R_OUT+12),yaw:-0.05,pitch:-0.34};
-const camEnd  ={pos:new THREE.Vector3(0,2.0,R_OUT+3.0),yaw:-0.28,pitch:-0.02}; // arrive on the entrance landing in the outer hall, inner domed rotunda ahead
+const camEnd  ={pos:new THREE.Vector3(0,2.0,R_OUT+1.4),yaw:-0.24,pitch:-0.02}; // arrive at the entrance threshold (inside the terrace wall), looking into the gallery
 let yaw=camStart.yaw,pitch=camStart.pitch;
 camera.position.copy(camStart.pos);
 let entered=false,flyT=0;
@@ -231,13 +231,40 @@ function floorTex(){
   const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;
 }
 const floorMap=floorTex();floorMap.wrapS=floorMap.wrapT=THREE.ClampToEdgeWrapping;
-const floorMatStone=new THREE.MeshStandardMaterial({map:floorMap,roughness:.72,metalness:0,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+const flagMat=new THREE.MeshStandardMaterial({map:floorMap,roughness:.72,metalness:0,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3});
+// pale travertine for the outer gallery + terrace (a calmer, DIFFERENT floor from the inner flagstone)
+function paleStoneTex(){
+  const S=1024,cv=document.createElement('canvas');cv.width=cv.height=S;const x=cv.getContext('2d');
+  x.fillStyle='#d8d2c4';x.fillRect(0,0,S,S);
+  for(let i=0;i<1500;i++){const r=8+Math.random()*42;x.globalAlpha=0.035+Math.random()*0.06;
+    x.fillStyle=Math.random()<.5?'#c3bcaa':'#e7e2d5';x.beginPath();x.ellipse(Math.random()*S,Math.random()*S,r,r*(0.4+Math.random()*0.5),Math.random()*6.28,0,6.28);x.fill();}
+  x.globalAlpha=1;const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(5,5);return t;
+}
+const paleMat=new THREE.MeshStandardMaterial({map:paleStoneTex(),color:0xdbd5c8,roughness:.5,metalness:0,envMapIntensity:.5,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
 // SEA — calm muted slate water
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshStandardMaterial({color:0x223a44,roughness:.32,metalness:.1,envMapIntensity:.5}));
 sea.rotation.x=-Math.PI/2;sea.position.y=-0.62;scene.add(sea);
-// one flagstone disc out to the terrace edge (covers interior + ambulatory + terrace in a single, identical floor)
-const floor=new THREE.Mesh(new THREE.CircleGeometry(RB,120),floorMatStone);
-floor.rotation.x=-Math.PI/2;floor.position.y=0;scene.add(floor);
+// ── ZONED FLOOR: dark flagstone inner rotunda + pale-stone outer gallery/terrace ──
+const floorIn=new THREE.Mesh(new THREE.CircleGeometry(R_IN+0.35,80),flagMat);floorIn.rotation.x=-Math.PI/2;floorIn.position.y=0.005;scene.add(floorIn);
+const floorOut=new THREE.Mesh(new THREE.RingGeometry(R_IN+0.1,RB,120,1),paleMat);floorOut.rotation.x=-Math.PI/2;floorOut.position.y=0;scene.add(floorOut);
+// flagstone entrance path linking the doorway to the inner rotunda (entrance floor = inner floor)
+const pathMap=floorMap.clone();pathMap.wrapS=pathMap.wrapT=THREE.RepeatWrapping;pathMap.repeat.set(0.16,0.42);pathMap.needsUpdate=true;
+const path=new THREE.Mesh(new THREE.PlaneGeometry(3.2,R_OUT-R_IN+1.8),new THREE.MeshStandardMaterial({map:pathMap,roughness:.72,metalness:0,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));
+path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(path);
+// ── DISPLAY VASES in the outer gallery (spaced along the wall, things to look at) ──
+(function galleryVases(){
+  const stoneV=new THREE.MeshStandardMaterial({color:0xd2cab6,roughness:.8,metalness:.05,envMapIntensity:.5});
+  const onyxV =new THREE.MeshStandardMaterial({color:0x161616,roughness:.3,metalness:.4,envMapIntensity:.75});
+  const profs=[(t)=>Math.sin(t*Math.PI*0.9)*0.3*(1-t*0.1)+0.08,(t)=>Math.sin(t*Math.PI)*0.38+0.07,(t)=>0.1+t*0.3];
+  const heights=[1.25,0.92,1.05];
+  for(let i=0;i<N_OUT;i++){ if(i%2)continue; const a=(i+0.5)*stepO; if(Math.min(a,Math.PI*2-a)<0.5)continue; // every other pier, skip entrance
+    const rr=R_OUT-1.5, sx=Math.sin(a)*rr, sz=Math.cos(a)*rr, k=(i/2)%3;
+    const pts=[];for(let j=0;j<=12;j++){const t=j/12;pts.push(new THREE.Vector2(Math.max(0.04,profs[k](t)),t*heights[k]));}
+    const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.48,0.34,20),stone);ped.position.set(sx,0.17,sz);scene.add(ped);
+    const v=new THREE.Mesh(new THREE.LatheGeometry(pts,24),(i/2)%2?stoneV:onyxV);v.position.set(sx,0.34,sz);scene.add(v);
+    const gr=new THREE.Mesh(new THREE.TorusGeometry(0.29,0.02,6,20),goldMat);gr.rotation.x=Math.PI/2;gr.position.set(sx,0.52,sz);scene.add(gr);
+  }
+})();
 
 // ── SEASIDE TERRACE + classical balustrade ring (the reference look: railed terrace over the sea, seen through every arch) ──
 (function terrace(){
@@ -349,8 +376,8 @@ function brandTex(){
   const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;return t;
 }
 (function entranceRug(){ // black rug with a gold border at the entrance threshold (inside)
-  const gb=new THREE.Mesh(new THREE.PlaneGeometry(3.4,4.6),new THREE.MeshStandardMaterial({color:GOLD,metalness:.85,roughness:.4,envMapIntensity:.8,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));gb.rotation.x=-Math.PI/2;gb.position.set(0,0.02,R_OUT+2.7);scene.add(gb);
-  const rug=new THREE.Mesh(new THREE.PlaneGeometry(3.05,4.25),new THREE.MeshStandardMaterial({color:0x141312,roughness:.85,metalness:0,envMapIntensity:.25,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.022,R_OUT+2.7);scene.add(rug);
+  const gb=new THREE.Mesh(new THREE.PlaneGeometry(3.4,4.6),new THREE.MeshStandardMaterial({color:GOLD,metalness:.85,roughness:.4,envMapIntensity:.8,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5}));gb.rotation.x=-Math.PI/2;gb.position.set(0,0.024,R_OUT+0.7);scene.add(gb);
+  const rug=new THREE.Mesh(new THREE.PlaneGeometry(3.05,4.25),new THREE.MeshStandardMaterial({color:0x141312,roughness:.85,metalness:0,envMapIntensity:.25,polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-6}));rug.rotation.x=-Math.PI/2;rug.position.set(0,0.026,R_OUT+0.7);scene.add(rug);
 })();
 (function easel(){const g=new THREE.Group();const wood=new THREE.MeshStandardMaterial({color:0x4a3a26,roughness:.7});
   const board=new THREE.Mesh(new THREE.BoxGeometry(1.55,2.0,0.07),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.5}));board.position.set(0,2.0,0);board.rotation.x=-0.07;g.add(board);
@@ -358,7 +385,7 @@ function brandTex(){
   const lg=new THREE.CylinderGeometry(0.045,0.045,3.0,8);
   [[-0.62,0.11,0],[0.62,-0.11,0]].forEach(([x,rz])=>{const l=new THREE.Mesh(lg,wood);l.position.set(x,1.3,0.1);l.rotation.z=rz;g.add(l);});
   const l3=new THREE.Mesh(lg,wood);l3.position.set(0,1.3,-0.55);l3.rotation.x=0.28;g.add(l3);
-  g.position.set(1.95,0,R_OUT+0.9);g.rotation.y=-0.32;scene.add(g);})(); // welcome easel on the entrance landing, angled toward the spawn
+  g.position.set(1.95,0,R_OUT-0.7);g.rotation.y=-0.3;scene.add(g);})(); // welcome easel just inside the entrance arch, angled toward the spawn
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x9a958c,0.62));
 const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun);
