@@ -7,25 +7,28 @@
 canvas{display:block}
 :root{--gold:#c9a84a}
 #hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);color:#cbb88a;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;background:rgba(12,12,12,.42);padding:6px 14px;border-radius:20px;pointer-events:none;z-index:9;border:1px solid rgba(201,168,74,.25)}
-#stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10}
-#stickR{right:26px;background:rgba(255,255,255,.07);border:1px solid rgba(201,168,74,.3)}
-#stick{left:26px;background:radial-gradient(circle,#9b9b9b 0%,#6b6b6b 100%);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 0 14px rgba(0,0,0,.35)}
-#stick::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
-#knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%}
-#knobR{background:rgba(201,168,74,.5);border:1px solid rgba(255,255,255,.4)}
-#knob{background:radial-gradient(circle,#dcdcdc,#9a9a9a);border:1px solid rgba(255,255,255,.5)}
+#stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10;background:radial-gradient(circle,#9b9b9b 0%,#6b6b6b 100%);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 0 14px rgba(0,0,0,.35)}
+#stick{left:26px}#stickR{right:26px}
+#stick::before,#stickR::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
+#knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:radial-gradient(circle,#dcdcdc,#9a9a9a);border:1px solid rgba(255,255,255,.5)}
 #xh{position:fixed;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(201,168,74,.6);box-shadow:0 0 0 4px rgba(255,255,255,.18);pointer-events:none;z-index:9}
-/* ── loading / intro overlay ── */
-#load{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 38%,#1a1a1a 0%,#0a0a0a 75%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1s ease}
+/* ── loading overlay (previous-version style) ── */
+#load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 38%,#171717 0%,#000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1.1s ease}
 #load.gone{opacity:0;pointer-events:none}
-#load .mono{width:118px;height:96px;margin-bottom:24px}
-#load .wm{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:40px;letter-spacing:.005em;color:#f3efe7}
-#load .tg{display:flex;align-items:center;justify-content:center;gap:13px;font-size:12px;letter-spacing:.42em;color:var(--gold);margin:9px 0 32px;padding-left:.42em}
-#load .tg::before,#load .tg::after{content:'';width:30px;height:1px;background:var(--gold)}
-#load .bar{width:230px;height:2px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden}
-#load .bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,#9a7f33,var(--gold));transition:width .5s ease}
-#load .pct{font-family:Georgia,serif;font-size:15px;color:var(--gold);margin-top:11px;letter-spacing:.08em}
-#load .st{font-size:10.5px;letter-spacing:.28em;color:#9b937f;margin-top:9px;text-transform:uppercase;min-height:14px}
+#load .mono{width:96px;height:auto;margin-bottom:28px}
+#load .mono path{stroke-dasharray:240;stroke-dashoffset:240;animation:vvdraw 1.3s cubic-bezier(.66,0,.34,1) forwards}
+#load .mono path:nth-child(2){animation-delay:.3s}
+#load .mono path:nth-child(3){animation-delay:.62s}
+#load .wm{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:300;font-size:15px;letter-spacing:.6em;text-indent:.6em;color:#fff;opacity:0;animation:fadeUp .9s ease .85s forwards}
+#load .tg{display:flex;align-items:center;justify-content:center;gap:11px;font-size:9px;letter-spacing:.66em;text-indent:.66em;color:var(--gold);margin:13px 0 0;opacity:0;animation:fadeUp .9s ease 1.1s forwards}
+#load .tg::before,#load .tg::after{content:'';width:22px;height:1px;background:var(--gold);opacity:.65}
+#load .bar{width:230px;height:1px;background:rgba(255,255,255,.12);position:relative;overflow:hidden;margin-top:46px;opacity:0;animation:fadeUp .8s ease 1.25s forwards}
+#load .bar i{position:absolute;inset-block:0;left:0;display:block;width:8%;background:linear-gradient(to right,var(--gold),#fff);transition:width .12s linear}
+#load .bar i::after{content:'';position:absolute;top:0;right:0;width:38px;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,.85))}
+#load .pct{font-size:9px;letter-spacing:.52em;text-indent:.52em;color:rgba(255,255,255,.45);margin-top:15px;opacity:0;animation:fadeUp .8s ease 1.35s forwards}
+#load .st{font-size:8.5px;letter-spacing:.3em;color:#7d7768;margin-top:10px;text-transform:uppercase;min-height:12px;opacity:0;animation:fadeUp .8s ease 1.5s forwards}
+@keyframes vvdraw{to{stroke-dashoffset:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
 #enter{margin-top:30px;padding:14px 40px;background:transparent;color:var(--gold);border:1px solid var(--gold);letter-spacing:.32em;font-size:12px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:.35s;opacity:0;pointer-events:none}
 #enter.on{opacity:1;pointer-events:auto}
 #enter:hover{background:var(--gold);color:#111}
@@ -123,7 +126,7 @@ function makeStick(el,knob,t){
 const resetMove=makeStick(document.getElementById('stick'),document.getElementById('knob'),move);
 const resetLook=makeStick(document.getElementById('stickR'),document.getElementById('knobR'),look);
 addEventListener('blur',()=>{resetMove();resetLook();});
-function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;return Math.abs(x)<2.2&&z>R_OUT-1&&z<R_OUT+13.5;} // inside the rotunda OR on the long entrance walkway out to the gate (+Z)
+function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;return Math.abs(x)<2.2&&z>R_OUT-1&&z<R_OUT+21.5;} // inside the rotunda OR on the long entrance jetty out to the far gate (+Z)
 
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 
@@ -133,7 +136,7 @@ let targetP=0,shownP=0,autoStarted=false;
 function setProg(p,msg){targetP=Math.max(targetP,p);if(msg)lstat.textContent=msg;}
 function autoEnter(){if(autoStarted)return;autoStarted=true;lstat.textContent='Welcome';setTimeout(()=>{document.getElementById('load').classList.add('gone');entered=true;},650);} // auto-enter at 100% — no button to click
 const loadTimer=setInterval(()=>{
-  shownP+=Math.max(0.5,(targetP-shownP)*0.07);if(shownP>targetP)shownP=targetP;
+  shownP+=Math.min(1.2,Math.max(0.4,(targetP-shownP)*0.06));if(shownP>targetP)shownP=targetP; // paced so the intro animation breathes (~2.5s min)
   barfill.style.width=shownP+'%';pct.textContent=Math.round(shownP)+'%';
   if(shownP>=99.5){clearInterval(loadTimer);barfill.style.width='100%';pct.textContent='100%';autoEnter();}
 },30);
@@ -321,20 +324,27 @@ path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(p
   for(let i=0;i<total;i++){const a=i/total*Math.PI*2;if(Math.min(a,Math.PI*2-a)<GAP)continue;d.position.set(Math.sin(a)*RB,0.6,Math.cos(a)*RB);d.updateMatrix();inst.setMatrixAt(n++,d.matrix);}
   inst.count=n;inst.instanceMatrix.needsUpdate=true;scene.add(inst);
   // ── entrance landing deck — LONGER walkway out to the gate ──
-  const DECKD=20, dckz=R_OUT+8;
+  const DECKD=34, dckz=R_OUT+15;
   const deck=new THREE.Mesh(new THREE.BoxGeometry(4.6,1.5,DECKD),deckMat);deck.position.set(0,-0.74,dckz);scene.add(deck); // top flush at +0.01
   [-2.15,2.15].forEach(sx=>{const p=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.55,DECKD),concrete);p.position.set(sx,0.2,dckz);scene.add(p);
     const pc=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.1,DECKD),railW);pc.position.set(sx,0.5,dckz);scene.add(pc);}); // black parapet caps
-  // ── entrance GATE — black wrought-iron with gold finials (two leaves), FAR at the end of the long walkway ──
+  // ── entrance GATE — grand black wrought-iron with a gold arched crown, FAR at the end of the long jetty ──
   const gateM=new THREE.MeshStandardMaterial({color:0x121212,roughness:.45,metalness:.6,envMapIntensity:.8});
-  const GW=4.6,GH=1.7,gz=R_OUT+14;
-  [-GW/2,0,GW/2].forEach(gx=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,GH+0.4,12),gateM);post.position.set(gx,(GH+0.4)/2,gz);scene.add(post);
-    const ball=new THREE.Mesh(new THREE.SphereGeometry(0.11,12,10),goldMat);ball.position.set(gx,GH+0.42,gz);scene.add(ball);}); // centre post splits two gate leaves
-  [0.18,GH].forEach(ry=>{const r=new THREE.Mesh(new THREE.BoxGeometry(GW,0.06,0.06),gateM);r.position.set(0,ry,gz);scene.add(r);});
-  const nb=Math.round(GW/0.21);
-  for(let i=1;i<nb;i++){const bx=-GW/2+i*(GW/nb);if(Math.abs(bx)<0.13)continue; // gap at the centre split
-    const bar=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,GH-0.2,8),gateM);bar.position.set(bx,0.18+(GH-0.2)/2,gz);scene.add(bar);
-    const sp=new THREE.Mesh(new THREE.ConeGeometry(0.04,0.15,8),goldMat);sp.position.set(bx,GH+0.07,gz);scene.add(sp);} // gold spear finials
+  const GW=5.4,GH=2.4,gz=R_OUT+22;
+  // tall posts (sides + centre split) with gold spire finials
+  [-GW/2,0,GW/2].forEach(gx=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,GH+0.5,12),gateM);post.position.set(gx,(GH+0.5)/2,gz);scene.add(post);
+    const fin=new THREE.Mesh(new THREE.ConeGeometry(0.13,0.36,10),goldMat);fin.position.set(gx,GH+0.5+0.18,gz);scene.add(fin);});
+  // rails
+  [0.2,GH*0.5,GH].forEach(ry=>{const r=new THREE.Mesh(new THREE.BoxGeometry(GW,0.06,0.06),gateM);r.position.set(0,ry,gz);scene.add(r);});
+  // vertical bars with gold spear tips
+  const nb=Math.round(GW/0.25);
+  for(let i=1;i<nb;i++){const bx=-GW/2+i*(GW/nb);if(Math.abs(bx)<0.14)continue; // gap at the centre split
+    const bar=new THREE.Mesh(new THREE.CylinderGeometry(0.023,0.023,GH-0.22,8),gateM);bar.position.set(bx,0.2+(GH-0.22)/2,gz);scene.add(bar);
+    const sp=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.16,8),goldMat);sp.position.set(bx,GH+0.05,gz);scene.add(sp);}
+  // gold arched crown over the gate + central medallion
+  const arcPts=[];for(let s=0;s<=24;s++){const u=s/24,ang=Math.PI*(1-u);arcPts.push(new THREE.Vector3(Math.cos(ang)*(GW/2+0.12),GH+0.5+Math.max(0,Math.sin(ang))*1.15,gz));}
+  const arch=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arcPts),30,0.06,6,false),goldMat);scene.add(arch);
+  const med=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.05,8,26),goldMat);med.rotation.x=0;med.position.set(0,GH+0.72,gz);scene.add(med);
   // caramel urns flanking the entrance (same design as the gallery vases)
   const urnM=new THREE.MeshStandardMaterial({color:0xa9763c,roughness:.62,metalness:.18,envMapIntensity:.6});
   const up=[];for(let i=0;i<=14;i++){const t=i/14;up.push(new THREE.Vector2(Math.max(0.05,Math.sin(t*Math.PI*0.94)*0.46*(1-t*0.12)+0.09),t*1.85));}
