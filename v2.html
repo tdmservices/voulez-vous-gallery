@@ -79,7 +79,7 @@ const camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,0.1,500);
 const GOLD=0xc9a84a, BLACK=0x141414, IVORY=0xe9e3d6, WHITE=0xf6f3ec;
 
 /* ── DIMENSIONS: two concentric rings ── */
-const R_OUT=16, R_IN=9;
+const R_OUT=16, R_IN=9, RB=R_OUT+2.75; // RB = terrace / balustrade radius
 const H=7, DRUM=2;
 const N_OUT=14, N_IN=16;
 const stepO=Math.PI*2/N_OUT, stepI=Math.PI*2/N_IN;
@@ -212,43 +212,46 @@ for(let i=0;i<14;i++){const a=i/14*Math.PI*2;const b=new THREE.Mesh(new THREE.Oc
 chand.scale.setScalar(1.85);chand.position.set(0,H+1.7,0);scene.add(chand);
 const chLight=new THREE.PointLight(0xffe9bd,58,55,2);chLight.position.set(0,H+1,0);scene.add(chLight);
 
-/* ── FLOOR: ivory marble terrazzo + black aisle carpet + gold thresholds ── */
+/* ── FLOOR: one unified flagstone / crazy-paving floor everywhere (inner rotunda + terrace + entrance) ── */
 function floorTex(){
-  const cv=document.createElement('canvas');cv.width=cv.height=1024;const x=cv.getContext('2d'),C=512;
-  const px=r=>r/R_OUT*C;
-  x.fillStyle='#ece6db';x.fillRect(0,0,1024,1024); // ivory marble base
-  for(let i=0;i<3000;i++){const ang=Math.random()*6.28,rr=Math.sqrt(Math.random())*C,pxp=C+Math.cos(ang)*rr,pyp=C+Math.sin(ang)*rr,r=2+Math.random()*14;
-    const g=Math.random();x.fillStyle=g<.55?'#d9d3c7':g<.8?'#c9a84a':'#1a1a1a';x.beginPath();const n=5+(i%4);
-    for(let k=0;k<n;k++){const aa=k/n*6.28,rad=r*(0.7+Math.random()*0.5);x.lineTo(pxp+Math.cos(aa)*rad,pyp+Math.sin(aa)*rad);}x.closePath();x.fill();}
-  // black carpet ring (aisle) between R_IN and R_OUT
-  x.fillStyle='#141312';x.beginPath();x.arc(C,C,px(R_OUT),0,6.28,false);x.arc(C,C,px(R_IN),0,6.28,true);x.fill();
-  // subtle charcoal runners aligned to outer bays (tone, not colour)
-  for(let i=0;i<N_OUT;i++){const a=(i+0.5)*stepO;x.save();x.translate(C,C);x.rotate(-a);x.fillStyle='#23211c';
-    x.fillRect(-px(0.7),px(R_IN+0.2),px(1.4),px(R_OUT-R_IN-0.6));
-    x.strokeStyle='#8a7330';x.lineWidth=2;x.strokeRect(-px(0.7),px(R_IN+0.2),px(1.4),px(R_OUT-R_IN-0.6));x.restore();}
-  // gold threshold rings
-  x.strokeStyle='#c9a84a';x.lineWidth=5;[R_IN,R_OUT-0.3].forEach(r=>{x.beginPath();x.arc(C,C,px(r),0,6.28);x.stroke();});
-  const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;
+  const S=2048,cv=document.createElement('canvas');cv.width=cv.height=S;const x=cv.getContext('2d');
+  x.fillStyle='#9b9486';x.fillRect(0,0,S,S);                 // muted stone-grey grout
+  const cells=46,step=S/cells;
+  for(let gy=-1;gy<=cells;gy++)for(let gx=-1;gx<=cells;gx++){
+    const cxp=(gx+0.5)*step+(Math.random()-0.5)*step*0.5;
+    const cyp=(gy+0.5)*step+(Math.random()-0.5)*step*0.5;
+    const n=6+Math.floor(Math.random()*3),rad=step*0.62;
+    x.beginPath();
+    for(let k=0;k<n;k++){const a=k/n*6.283+Math.random()*0.28,rr=rad*(0.78+Math.random()*0.4),pxp=cxp+Math.cos(a)*rr,pyp=cyp+Math.sin(a)*rr;k?x.lineTo(pxp,pyp):x.moveTo(pxp,pyp);}
+    x.closePath();
+    const g=Math.random();x.fillStyle=g<.5?'#36352f':g<.8?'#403e36':'#2c2b26';   // dark-grey flagstones, subtle variation
+    x.fill();
+    x.strokeStyle='rgba(120,114,102,.4)';x.lineWidth=2;x.stroke();                // soft grout line
+  }
+  const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t;
 }
-// SEA — calm muted slate water (desaturated → on-brand, still reads as sea)
+const floorMap=floorTex();floorMap.wrapS=floorMap.wrapT=THREE.ClampToEdgeWrapping;
+const floorMatStone=new THREE.MeshStandardMaterial({map:floorMap,roughness:.72,metalness:0,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+// SEA — calm muted slate water
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshStandardMaterial({color:0x223a44,roughness:.32,metalness:.1,envMapIntensity:.5}));
 sea.rotation.x=-Math.PI/2;sea.position.y=-0.62;scene.add(sea);
-const floor=new THREE.Mesh(new THREE.CircleGeometry(R_OUT,96),new THREE.MeshStandardMaterial({map:floorTex(),roughness:.5,metalness:0,envMapIntensity:.4,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+// one flagstone disc out to the terrace edge (covers interior + ambulatory + terrace in a single, identical floor)
+const floor=new THREE.Mesh(new THREE.CircleGeometry(RB,120),floorMatStone);
 floor.rotation.x=-Math.PI/2;floor.position.y=0;scene.add(floor);
 
 // ── SEASIDE TERRACE + classical balustrade ring (the reference look: railed terrace over the sea, seen through every arch) ──
 (function terrace(){
-  const RB=R_OUT+2.75, GAP=0.21;        // RB = balustrade radius; GAP = entrance opening half-angle at +Z
+  const GAP=0.21;                       // entrance opening half-angle at +Z
   const TS=GAP, TL=Math.PI*2-2*GAP;     // ring elements span everything EXCEPT the entrance gap
-  const cobble=new THREE.MeshStandardMaterial({color:0xbfb9ac,roughness:.97,metalness:0,envMapIntensity:.45});
-  const railW =new THREE.MeshStandardMaterial({color:0xe9e4d8,roughness:.7,metalness:0,envMapIntensity:.6});
-  const plinthD=new THREE.MeshStandardMaterial({color:0x2a2926,roughness:.92});
-  // stone terrace floor ring, flush with the interior floor
-  const terr=new THREE.Mesh(new THREE.RingGeometry(R_OUT-0.2,RB,90),cobble);terr.rotation.x=-Math.PI/2;terr.position.y=0.004;scene.add(terr);
-  // dark plinth band + cliff down to the water (gapped at the entrance)
-  const plinth=new THREE.Mesh(new THREE.CylinderGeometry(RB,RB,0.55,104,1,true,TS,TL),plinthD);plinth.position.y=0.275;plinth.material.side=THREE.DoubleSide;scene.add(plinth);
-  const cliff =new THREE.Mesh(new THREE.CylinderGeometry(RB,RB,1.5,104,1,true,TS,TL),plinthD);cliff.position.y=-0.75;cliff.material.side=THREE.DoubleSide;scene.add(cliff);
-  // white cap band on the plinth + handrail band on the balusters (gapped)
+  const railW   =new THREE.MeshStandardMaterial({color:0xe9e4d8,roughness:.7,metalness:0,envMapIntensity:.6});
+  const concrete=new THREE.MeshStandardMaterial({color:0x83817a,roughness:.95,metalness:0,envMapIntensity:.3}); // grey concrete terrace wall
+  const concreteD=new THREE.MeshStandardMaterial({color:0x5d5b55,roughness:.95,metalness:0,envMapIntensity:.25}); // darker concrete below the waterline
+  const deckMap=floorMap.clone();deckMap.wrapS=deckMap.wrapT=THREE.RepeatWrapping;deckMap.repeat.set(0.13,0.18);deckMap.needsUpdate=true;
+  const deckMat=new THREE.MeshStandardMaterial({map:deckMap,roughness:.72,metalness:0,envMapIntensity:.35});
+  // grey-concrete terrace wall (plinth) + cliff down to the water (gapped at the entrance)
+  const plinth=new THREE.Mesh(new THREE.CylinderGeometry(RB,RB,0.55,104,1,true,TS,TL),concrete);plinth.position.y=0.275;plinth.material.side=THREE.DoubleSide;scene.add(plinth);
+  const cliff =new THREE.Mesh(new THREE.CylinderGeometry(RB,RB,1.5,104,1,true,TS,TL),concreteD);cliff.position.y=-0.75;cliff.material.side=THREE.DoubleSide;scene.add(cliff);
+  // white cap band on the wall + handrail band on the balusters (gapped)
   const cap =new THREE.Mesh(new THREE.CylinderGeometry(RB+0.04,RB+0.04,0.1,104,1,true,TS,TL),railW);cap.position.y=0.58;cap.material.side=THREE.DoubleSide;scene.add(cap);
   const hand=new THREE.Mesh(new THREE.CylinderGeometry(RB+0.05,RB+0.05,0.12,104,1,true,TS,TL),railW);hand.position.y=1.24;hand.material.side=THREE.DoubleSide;scene.add(hand);
   // turned balusters (skip the entrance gap)
@@ -258,10 +261,20 @@ floor.rotation.x=-Math.PI/2;floor.position.y=0;scene.add(floor);
   const inst=new THREE.InstancedMesh(balGeo,railW,total);const d=new THREE.Object3D();let n=0;
   for(let i=0;i<total;i++){const a=i/total*Math.PI*2;if(Math.min(a,Math.PI*2-a)<GAP)continue;d.position.set(Math.sin(a)*RB,0.6,Math.cos(a)*RB);d.updateMatrix();inst.setMatrixAt(n++,d.matrix);}
   inst.count=n;inst.instanceMatrix.needsUpdate=true;scene.add(inst);
-  // ── entrance landing deck (fills the gap, flush top, out to where you spawn) ──
-  const deck=new THREE.Mesh(new THREE.BoxGeometry(4.6,1.5,6.6),cobble);deck.position.set(0,-0.74,R_OUT+2.6);scene.add(deck); // top at +0.01
-  [-2.15,2.15].forEach(sx=>{const p=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.55,6.6),plinthD);p.position.set(sx,0.2,R_OUT+2.6);scene.add(p);
-    const pc=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.1,6.6),railW);pc.position.set(sx,0.5,R_OUT+2.6);scene.add(pc);});
+  // ── entrance landing deck (flagstone top, fills the gap, out to where you spawn) ──
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(4.6,1.5,7.6),deckMat);deck.position.set(0,-0.74,R_OUT+3.1);scene.add(deck); // top flush at +0.01
+  [-2.15,2.15].forEach(sx=>{const p=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.55,7.6),concrete);p.position.set(sx,0.2,R_OUT+3.1);scene.add(p);
+    const pc=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.1,7.6),railW);pc.position.set(sx,0.5,R_OUT+3.1);scene.add(pc);});
+  // ── entrance GATE at the far end of the terrace (white metal railing, like the reference) ──
+  const gate=new THREE.MeshStandardMaterial({color:0xdedbd3,roughness:.5,metalness:.55,envMapIntensity:.9});
+  const GW=4.5,GH=1.4,gz=R_OUT+6.4;
+  [-GW/2,GW/2].forEach(gx=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,GH+0.35,10),gate);post.position.set(gx,(GH+0.35)/2,gz);scene.add(post);
+    const ball=new THREE.Mesh(new THREE.SphereGeometry(0.12,10,8),gate);ball.position.set(gx,GH+0.35,gz);scene.add(ball);});
+  [0.16,GH].forEach(ry=>{const r=new THREE.Mesh(new THREE.BoxGeometry(GW,0.07,0.07),gate);r.position.set(0,ry,gz);scene.add(r);});
+  const nb=Math.round(GW/0.23);
+  for(let i=1;i<nb;i++){const bx=-GW/2+i*(GW/nb);
+    const bar=new THREE.Mesh(new THREE.CylinderGeometry(0.026,0.026,GH-0.16,8),gate);bar.position.set(bx,0.16+(GH-0.16)/2,gz);scene.add(bar);
+    const sp=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.13,8),gate);sp.position.set(bx,GH+0.07,gz);scene.add(sp);}
   // pale-stone urns flanking the entrance on the landing
   const urnM=new THREE.MeshStandardMaterial({color:0xd2cab6,roughness:.85,metalness:.05,envMapIntensity:.55});
   const up=[];for(let i=0;i<=10;i++){const t=i/10;up.push(new THREE.Vector2(Math.sin(t*Math.PI*0.95)*0.34*(1-t*0.2)+0.06,t*1.05));}
