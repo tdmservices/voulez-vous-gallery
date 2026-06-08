@@ -123,7 +123,7 @@ function makeStick(el,knob,t){
 const resetMove=makeStick(document.getElementById('stick'),document.getElementById('knob'),move);
 const resetLook=makeStick(document.getElementById('stickR'),document.getElementById('knobR'),look);
 addEventListener('blur',()=>{resetMove();resetLook();});
-function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;return Math.abs(x)<2.2&&z>R_OUT-1&&z<R_OUT+8.2;} // inside the rotunda OR on the longer entrance walkway (+Z)
+function allowed(x,z){const r=Math.hypot(x,z);if(r<R_OUT-0.8&&r>1.5)return true;return Math.abs(x)<2.2&&z>R_OUT-1&&z<R_OUT+13.5;} // inside the rotunda OR on the long entrance walkway out to the gate (+Z)
 
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 
@@ -321,13 +321,13 @@ path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(p
   for(let i=0;i<total;i++){const a=i/total*Math.PI*2;if(Math.min(a,Math.PI*2-a)<GAP)continue;d.position.set(Math.sin(a)*RB,0.6,Math.cos(a)*RB);d.updateMatrix();inst.setMatrixAt(n++,d.matrix);}
   inst.count=n;inst.instanceMatrix.needsUpdate=true;scene.add(inst);
   // ── entrance landing deck — LONGER walkway out to the gate ──
-  const DECKD=11, dckz=R_OUT+4.3;
+  const DECKD=20, dckz=R_OUT+8;
   const deck=new THREE.Mesh(new THREE.BoxGeometry(4.6,1.5,DECKD),deckMat);deck.position.set(0,-0.74,dckz);scene.add(deck); // top flush at +0.01
   [-2.15,2.15].forEach(sx=>{const p=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.55,DECKD),concrete);p.position.set(sx,0.2,dckz);scene.add(p);
     const pc=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.1,DECKD),railW);pc.position.set(sx,0.5,dckz);scene.add(pc);}); // black parapet caps
-  // ── entrance GATE — black wrought-iron with gold finials (two leaves), at the far end of the longer walkway ──
+  // ── entrance GATE — black wrought-iron with gold finials (two leaves), FAR at the end of the long walkway ──
   const gateM=new THREE.MeshStandardMaterial({color:0x121212,roughness:.45,metalness:.6,envMapIntensity:.8});
-  const GW=4.6,GH=1.7,gz=R_OUT+8.6;
+  const GW=4.6,GH=1.7,gz=R_OUT+14;
   [-GW/2,0,GW/2].forEach(gx=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,GH+0.4,12),gateM);post.position.set(gx,(GH+0.4)/2,gz);scene.add(post);
     const ball=new THREE.Mesh(new THREE.SphereGeometry(0.11,12,10),goldMat);ball.position.set(gx,GH+0.42,gz);scene.add(ball);}); // centre post splits two gate leaves
   [0.18,GH].forEach(ry=>{const r=new THREE.Mesh(new THREE.BoxGeometry(GW,0.06,0.06),gateM);r.position.set(0,ry,gz);scene.add(r);});
