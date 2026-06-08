@@ -17,9 +17,10 @@ canvas{display:block}
 /* ── loading / intro overlay ── */
 #load{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 38%,#1a1a1a 0%,#0a0a0a 75%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1s ease}
 #load.gone{opacity:0;pointer-events:none}
-#load .mono{width:120px;height:92px;margin-bottom:26px}
-#load .wm{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:42px;letter-spacing:.04em;color:#f3efe7}
-#load .tg{font-size:13px;letter-spacing:.5em;color:var(--gold);margin:10px 0 34px;padding-left:.5em}
+#load .mono{width:118px;height:96px;margin-bottom:24px}
+#load .wm{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:40px;letter-spacing:.005em;color:#f3efe7}
+#load .tg{display:flex;align-items:center;justify-content:center;gap:13px;font-size:12px;letter-spacing:.42em;color:var(--gold);margin:9px 0 32px;padding-left:.42em}
+#load .tg::before,#load .tg::after{content:'';width:30px;height:1px;background:var(--gold)}
 #load .bar{width:230px;height:2px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden}
 #load .bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,#9a7f33,var(--gold));transition:width .5s ease}
 #load .pct{font-family:Georgia,serif;font-size:15px;color:var(--gold);margin-top:11px;letter-spacing:.08em}
@@ -53,11 +54,13 @@ canvas{display:block}
   <a id="pview" href="#" target="_blank" rel="noopener">View Product</a>
 </div>
 <div id="load">
-  <svg class="mono" viewBox="0 0 120 92" fill="none" stroke="#c9a84a" stroke-width="9" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M14 10 L42 82 L70 10"/><path d="M50 10 L78 82 L106 10"/>
+  <svg class="mono" viewBox="0 0 132 104" fill="none" stroke="#c9a84a" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
+    <path d="M12 8 L52 96 L66 24" stroke-width="13"/>
+    <path d="M120 8 L80 96 L66 24" stroke-width="13"/>
+    <path d="M66 28 L66 5" stroke-width="6"/>
   </svg>
   <div class="wm">Voulez-Vous</div>
-  <div class="tg">BORN&nbsp;&nbsp;TO&nbsp;&nbsp;WIN</div>
+  <div class="tg">BORN TO WIN</div>
   <div class="bar"><i id="barfill"></i></div>
   <div class="pct" id="pct">0%</div>
   <div class="st" id="lstat">Preparing the gallery…</div>
@@ -382,11 +385,17 @@ function pick(x,y){
 /* ── ENTRANCE: landing + VV branding easel ── */
 function brandTex(){
   const cv=document.createElement('canvas');cv.width=512;cv.height=652;const x=cv.getContext('2d');
-  x.fillStyle='#fbf9f4';x.fillRect(0,0,512,652);x.strokeStyle='#c9a84a';x.lineWidth=3;x.strokeRect(22,22,468,608);
-  x.strokeStyle='#141414';x.lineWidth=26;const cx=256,V=ox=>{x.beginPath();x.moveTo(cx-95+ox,120);x.lineTo(cx-30+ox,300);x.lineTo(cx+35+ox,120);x.stroke();};V(-36);V(36);
-  x.fillStyle='#141414';x.textAlign='center';x.font='300 56px Georgia';x.fillText('Voulez-Vous',cx,402);
-  x.font='600 23px Arial';x.fillText('B O R N   T O   W I N',cx,442);
-  x.fillStyle='#b08d3c';x.font='600 22px Arial';x.fillText('STEP INTO THE GALLERY',cx,560);
+  x.fillStyle='#ffffff';x.fillRect(0,0,512,652);x.strokeStyle='#c9a84a';x.lineWidth=3;x.strokeRect(22,22,468,608);
+  // interlocking double-V monogram (matches the brand logo)
+  const cx=256;x.strokeStyle='#141414';x.lineCap='butt';x.lineJoin='miter';x.miterLimit=10;
+  x.lineWidth=30;
+  x.beginPath();x.moveTo(cx-92,118);x.lineTo(cx-30,318);x.lineTo(cx,150);x.stroke();   // left V
+  x.beginPath();x.moveTo(cx+92,118);x.lineTo(cx+30,318);x.lineTo(cx,150);x.stroke();   // right V
+  x.lineWidth=12;x.beginPath();x.moveTo(cx,160);x.lineTo(cx,104);x.stroke();           // centre spike
+  x.fillStyle='#141414';x.textAlign='center';x.font='600 58px "Helvetica Neue",Arial,sans-serif';x.fillText('Voulez-Vous',cx,426);
+  x.font='600 22px Arial';x.fillText('BORN  TO  WIN',cx,466);
+  x.lineWidth=2;x.beginPath();x.moveTo(cx-150,459);x.lineTo(cx-108,459);x.moveTo(cx+108,459);x.lineTo(cx+150,459);x.stroke(); // tagline side rules
+  x.fillStyle='#b08d3c';x.font='600 22px Arial';x.fillText('STEP INTO THE GALLERY',cx,566);
   const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;return t;
 }
 (function entranceRug(){ // black rug with a gold border at the entrance threshold (inside)
