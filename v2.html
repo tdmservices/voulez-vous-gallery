@@ -28,16 +28,18 @@ canvas{display:block}
 #enter{margin-top:30px;padding:14px 40px;background:transparent;color:var(--gold);border:1px solid var(--gold);letter-spacing:.32em;font-size:12px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:.35s;opacity:0;pointer-events:none}
 #enter.on{opacity:1;pointer-events:auto}
 #enter:hover{background:var(--gold);color:#111}
-/* ── product panel ── */
-#panel{position:fixed;z-index:40;right:0;top:0;height:100%;width:340px;max-width:86vw;background:rgba(14,14,14,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-left:1px solid rgba(201,168,74,.35);transform:translateX(100%);transition:transform .45s cubic-bezier(.4,0,.1,1);display:flex;flex-direction:column;padding:26px 26px 30px;color:#f1ede5}
-#panel.open{transform:none}
-#pclose{align-self:flex-end;background:none;border:none;color:#cbb88a;font-size:26px;line-height:1;cursor:pointer}
-#pimg{width:100%;aspect-ratio:1;object-fit:cover;background:#f4f1ea;border:1px solid rgba(201,168,74,.3);margin:6px 0 20px}
-#ptitle{font-family:Georgia,serif;font-size:23px;line-height:1.25;color:#f6f2ea}
-#pprice{color:var(--gold);font-size:16px;letter-spacing:.05em;margin:12px 0 24px}
-#pview{margin-top:auto;text-align:center;padding:14px;background:var(--gold);color:#141414;letter-spacing:.26em;font-size:12px;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:.3s}
+/* ── product card (centered modal) ── */
+#panel{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+#panel.open{opacity:1;pointer-events:auto}
+#pcard{position:relative;width:330px;max-width:88vw;background:#f7f4ed;border-radius:16px;padding:24px 22px 22px;box-shadow:0 30px 80px rgba(0,0,0,.55);text-align:center;transform:translateY(14px) scale(.97);transition:transform .3s}
+#panel.open #pcard{transform:none}
+#pcard .cap{font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:#a99a6a;margin-bottom:12px}
+#pclose{position:absolute;top:10px;right:14px;background:none;border:none;color:#9a958c;font-size:25px;line-height:1;cursor:pointer}
+#pimg{width:100%;aspect-ratio:1;object-fit:cover;background:#fff;border-radius:11px;border:1px solid #e7e1d2;margin:2px 0 18px}
+#ptitle{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:14px;letter-spacing:.13em;text-transform:uppercase;color:#1a1a1a;line-height:1.45}
+#pprice{font-family:Georgia,serif;font-size:21px;color:#1a1a1a;margin:9px 0 19px}
+#pview{display:block;padding:14px;background:var(--gold);color:#141414;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;text-decoration:none;border-radius:9px;transition:.3s}
 #pview:hover{background:#e0c267}
-.cap{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#9b937f;margin-bottom:4px}
 </style></head>
 <body>
 <canvas id="c"></canvas>
@@ -46,12 +48,14 @@ canvas{display:block}
 <div id="stickR"><div id="knobR"></div></div>
 <div id="xh"></div>
 <div id="panel">
-  <button id="pclose">&times;</button>
-  <div class="cap">Voulez-Vous</div>
-  <img id="pimg" alt="">
-  <div id="ptitle"></div>
-  <div id="pprice"></div>
-  <a id="pview" href="#" target="_blank" rel="noopener">View Product</a>
+  <div id="pcard">
+    <button id="pclose">&times;</button>
+    <div class="cap">Voulez-Vous</div>
+    <img id="pimg" alt="">
+    <div id="ptitle"></div>
+    <div id="pprice"></div>
+    <a id="pview" href="#" target="_blank" rel="noopener">Go to Product</a>
+  </div>
 </div>
 <div id="load">
   <svg class="mono" viewBox="0 0 132 104" fill="none" stroke="#c9a84a" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
@@ -356,16 +360,19 @@ for(let q=0;q<4;q++){const a=q/4*Math.PI*2+Math.PI/4;
   const sp=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ppts),64,0.045,8,false),spiralMat);
   sp.position.set(Math.sin(a)*1.55,0.02,Math.cos(a)*1.55);spiralGroup.add(sp);}
 
-/* ── PRODUCT FRAMES on inner piers (face the centre) ── */
-const frameMat=new THREE.MeshStandardMaterial({color:WHITE,roughness:.5});
-const goldFrameMat=new THREE.MeshStandardMaterial({color:GOLD,roughness:.35,metalness:.9,envMapIntensity:1.1});
+/* ── PRODUCT DISPLAYS on inner piers: slim black-framed prints (face the centre) ── */
+const blackFrameMat=new THREE.MeshStandardMaterial({color:0x111111,roughness:.45,metalness:.25,envMapIntensity:.6});
+const matBoardMat=new THREE.MeshStandardMaterial({color:0xf6f3ec,roughness:.7});
 const artCanvases=[],picks=[];
-const PROD_Y=2.05; // lower, natural eye-level height (was too high — felt out of reach)
-for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.56;
-  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.09),frameMat);f.position.set(Math.sin(a)*fr,PROD_Y,Math.cos(a)*fr);f.rotation.y=a+Math.PI;scene.add(f);
-  const trim=new THREE.Mesh(new THREE.TorusGeometry(0.86,0.025,6,4),goldFrameMat);trim.position.copy(f.position);trim.rotation.y=a+Math.PI;trim.rotation.z=Math.PI/4;scene.add(trim);
-  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.32,1.32),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
-  c.position.set(Math.sin(a)*(fr-0.05),PROD_Y,Math.cos(a)*(fr-0.05));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f);f.userData.idx=i;
+const PROD_Y=2.0;
+for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=Math.cos(a);
+  // slim black frame
+  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.05),blackFrameMat);f.position.set(nx*fr,PROD_Y,nz*fr);f.rotation.y=a+Math.PI;scene.add(f);
+  // white mat board, inset → leaves a thin black frame border
+  const mat=new THREE.Mesh(new THREE.PlaneGeometry(1.36,1.36),matBoardMat);mat.position.set(nx*(fr-0.03),PROD_Y,nz*(fr-0.03));mat.rotation.y=a+Math.PI;scene.add(mat);
+  // product image, inset on the mat
+  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.18,1.18),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
+  c.position.set(nx*(fr-0.045),PROD_Y,nz*(fr-0.045));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,mat);f.userData.idx=i;mat.userData.idx=i;
 }
 /* live Shopify catalogue */
 const SHOP={domain:'voulezvous-9945.myshopify.com',token:'6e0cf7b855cc8f3a88706494a6adfc93',ver:'2024-07'};
@@ -382,6 +389,7 @@ let PRODUCTS=[];
 /* ── product panel ── */
 const panel=document.getElementById('panel'),pimg=document.getElementById('pimg'),ptitle=document.getElementById('ptitle'),pprice=document.getElementById('pprice'),pview=document.getElementById('pview');
 document.getElementById('pclose').onclick=()=>panel.classList.remove('open');
+panel.addEventListener('click',e=>{if(e.target===panel)panel.classList.remove('open');}); // tap outside the card to close
 const fmt={USD:'$',EUR:'€',GBP:'£',PKR:'₨',AED:'AED ',INR:'₹'};
 function money(m){if(!m)return'';const s=fmt[m.currencyCode]||(m.currencyCode+' ');return s+Math.round(parseFloat(m.amount)).toLocaleString();}
 const ray=new THREE.Raycaster();
