@@ -375,13 +375,7 @@ path.rotation.x=-Math.PI/2;path.position.set(0,0.008,(R_IN+R_OUT)/2);scene.add(p
   const arcPts=[];for(let s=0;s<=24;s++){const u=s/24,ang=Math.PI*(1-u);arcPts.push(new THREE.Vector3(Math.cos(ang)*(GW/2+0.12),GH+0.5+Math.max(0,Math.sin(ang))*1.15,gz));}
   const arch=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arcPts),30,0.06,6,false),goldMat);scene.add(arch);
   const med=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.05,8,26),goldMat);med.rotation.x=0;med.position.set(0,GH+0.72,gz);scene.add(med);
-  // caramel urns flanking the entrance (same design as the gallery vases)
-  const urnM=new THREE.MeshStandardMaterial({color:0xa9763c,roughness:.62,metalness:.18,envMapIntensity:.6});
-  const up=[];for(let i=0;i<=14;i++){const t=i/14;up.push(new THREE.Vector2(Math.max(0.05,Math.sin(t*Math.PI*0.94)*0.46*(1-t*0.12)+0.09),t*1.85));}
-  const ug=new THREE.LatheGeometry(up,28);
-  [[-1.85,R_OUT+0.2],[1.85,R_OUT+0.2]].forEach(([ux,uz])=>{const u=new THREE.Mesh(ug,urnM);u.position.set(ux,0.34,uz);scene.add(u);
-    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.56,0.34,20),stone);b.position.set(ux,0.17,uz);scene.add(b);
-    const gb=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.022,6,22),goldMat);gb.rotation.x=Math.PI/2;gb.position.set(ux,0.62,uz);scene.add(gb);});
+  // (entrance-flanking urns removed — they blocked the entrance)
 })();
 
 /* ── CENTRE: glass/mirror stage + faceted black rock with gold veins + 4 spiral light-yellow accents ── */
