@@ -9,3 +9,6 @@ assets/products/*.jpg
 
 # Shopify import artifact (not needed at runtime)
 products-shopify.csv
+
+# logo source mockup (only the cropped assets/vv-logo.jpg is used)
+VV LOGO*.jpg

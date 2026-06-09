@@ -42,6 +42,10 @@ canvas{display:block}
 #intro .i-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--gold),#e0c267);transform:scaleX(0);transform-origin:left;transition:transform .42s cubic-bezier(.66,0,.34,1)}
 #intro .i-btn:hover::before{transform:scaleX(1)}
 #intro .i-btn:hover{color:#111;border-color:#e0c267}
+/* real brand logo (white on the dark screens via invert + screen blend) */
+.blogo{width:auto;height:auto;filter:invert(1);mix-blend-mode:screen}
+#load .blogo{width:260px;margin-bottom:30px;opacity:0;animation:fadeUp 1s ease .4s forwards}
+#intro .blogo{width:290px;margin-bottom:6px;animation:floaty 5.5s ease-in-out infinite}
 @keyframes vvdraw{to{stroke-dashoffset:0}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -78,21 +82,13 @@ canvas{display:block}
   </div>
 </div>
 <div id="load">
-  <svg class="mono" viewBox="0 0 120 90" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter">
-    <path d="M18 8 L46 80 L74 8"/><path d="M46 8 L74 80 L102 8"/>
-  </svg>
-  <div class="wm">Voulez-Vous</div>
-  <div class="tg">Born To Win</div>
+  <img class="blogo" src="assets/vv-logo.jpg" alt="Voulez-Vous — Born To Win">
   <div class="bar"><i id="barfill"></i></div>
   <div class="pct" id="pct">0%</div>
   <div class="st" id="lstat">Preparing the gallery…</div>
 </div>
 <div id="intro">
-  <svg class="mono" viewBox="0 0 120 90" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter">
-    <path d="M18 8 L46 80 L74 8"/><path d="M46 8 L74 80 L102 8"/>
-  </svg>
-  <div class="i-name">Voulez-Vous</div>
-  <div class="i-tag">Born To Win</div>
+  <img class="blogo" src="assets/vv-logo.jpg" alt="Voulez-Vous — Born To Win">
   <div class="i-sep"></div>
   <div class="i-hints">
     <b>WASD / Joystick</b> &nbsp;·&nbsp; Walk<br>
