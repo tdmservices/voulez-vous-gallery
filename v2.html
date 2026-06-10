@@ -42,10 +42,10 @@ canvas{display:block}
 #intro .i-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--gold),#e0c267);transform:scaleX(0);transform-origin:left;transition:transform .42s cubic-bezier(.66,0,.34,1)}
 #intro .i-btn:hover::before{transform:scaleX(1)}
 #intro .i-btn:hover{color:#111;border-color:#e0c267}
-/* real brand logo (white on the dark screens via invert + screen blend) */
-.blogo{width:auto;height:auto;filter:invert(1);mix-blend-mode:screen}
-#load .blogo{width:260px;margin-bottom:30px;opacity:0;animation:fadeUp 1s ease .4s forwards}
-#intro .blogo{width:290px;margin-bottom:6px;animation:floaty 5.5s ease-in-out infinite}
+/* real brand logo — shown on its white background as a card */
+.blogo{width:auto;height:auto;background:#fff;border-radius:10px;box-shadow:0 18px 55px rgba(0,0,0,.5)}
+#load .blogo{width:300px;margin-bottom:30px;opacity:0;animation:fadeUp 1s ease .4s forwards}
+#intro .blogo{width:330px;margin-bottom:6px;animation:floaty 5.5s ease-in-out infinite}
 @keyframes vvdraw{to{stroke-dashoffset:0}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -438,18 +438,15 @@ function pick(x,y){
 /* ── ENTRANCE: landing + VV branding easel ── */
 function brandTex(){
   const cv=document.createElement('canvas');cv.width=512;cv.height=652;const x=cv.getContext('2d');
-  x.fillStyle='#ffffff';x.fillRect(0,0,512,652);x.strokeStyle='#c9a84a';x.lineWidth=3;x.strokeRect(22,22,468,608);
-  // interlocking double-V monogram (matches the brand logo)
-  const cx=256;x.strokeStyle='#141414';x.lineCap='butt';x.lineJoin='miter';x.miterLimit=10;
-  x.lineWidth=30;
-  x.beginPath();x.moveTo(cx-92,118);x.lineTo(cx-30,318);x.lineTo(cx,150);x.stroke();   // left V
-  x.beginPath();x.moveTo(cx+92,118);x.lineTo(cx+30,318);x.lineTo(cx,150);x.stroke();   // right V
-  x.lineWidth=12;x.beginPath();x.moveTo(cx,160);x.lineTo(cx,104);x.stroke();           // centre spike
-  x.fillStyle='#141414';x.textAlign='center';x.font='600 58px "Helvetica Neue",Arial,sans-serif';x.fillText('Voulez-Vous',cx,426);
-  x.font='600 22px Arial';x.fillText('BORN  TO  WIN',cx,466);
-  x.lineWidth=2;x.beginPath();x.moveTo(cx-150,459);x.lineTo(cx-108,459);x.moveTo(cx+108,459);x.lineTo(cx+150,459);x.stroke(); // tagline side rules
-  x.fillStyle='#b08d3c';x.font='600 22px Arial';x.fillText('STEP INTO THE GALLERY',cx,566);
-  const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;return t;
+  const cx=256;
+  function base(){x.fillStyle='#ffffff';x.fillRect(0,0,512,652);x.strokeStyle='#c9a84a';x.lineWidth=3;x.strokeRect(22,22,468,608);
+    x.fillStyle='#b08d3c';x.textAlign='center';x.font='600 22px Arial';x.fillText('STEP INTO THE GALLERY',cx,572);}
+  base();
+  const t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;
+  // draw the real brand logo onto the white sign once it loads
+  const img=new Image();img.onload=()=>{const w=400,h=img.height*(w/img.width);x.drawImage(img,(512-w)/2,150,w,h);t.needsUpdate=true;};
+  img.src='assets/vv-logo.jpg';
+  return t;
 }
 (function entranceRug(){ // black rug with a gold border at the entrance threshold (inside)
   const gb=new THREE.Mesh(new THREE.PlaneGeometry(3.4,4.6),new THREE.MeshStandardMaterial({color:GOLD,metalness:.85,roughness:.4,envMapIntensity:.8,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5}));gb.rotation.x=-Math.PI/2;gb.position.set(0,0.024,R_OUT+0.7);scene.add(gb);
