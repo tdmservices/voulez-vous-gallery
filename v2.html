@@ -62,8 +62,13 @@ canvas{display:block}
 #pimg{width:100%;aspect-ratio:1;object-fit:cover;background:#fff;border-radius:11px;border:1px solid #e7e1d2;margin:2px 0 18px}
 #ptitle{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:14px;letter-spacing:.13em;text-transform:uppercase;color:#1a1a1a;line-height:1.45}
 #pprice{font-family:Georgia,serif;font-size:21px;color:#1a1a1a;margin:9px 0 19px}
-#pview{display:block;padding:14px;background:var(--gold);color:#141414;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;text-decoration:none;border-radius:9px;transition:.3s}
-#pview:hover{background:#e0c267}
+#psizes{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:0 0 18px}
+.psize{min-width:40px;padding:9px 11px;border:1px solid #d8d2c4;background:#fff;color:#1a1a1a;font-size:11px;letter-spacing:.05em;border-radius:7px;cursor:pointer;transition:.18s}
+.psize.on{background:#141414;color:#fff;border-color:#141414}
+.psize:disabled{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+#pbuy{display:block;width:100%;padding:15px;background:var(--gold);color:#141414;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;border:none;border-radius:9px;cursor:pointer;transition:.3s}
+#pbuy:hover{background:#e0c267}
+#pbuy:disabled{opacity:.55;cursor:default}
 </style></head>
 <body>
 <canvas id="c"></canvas>
@@ -78,7 +83,8 @@ canvas{display:block}
     <img id="pimg" alt="">
     <div id="ptitle"></div>
     <div id="pprice"></div>
-    <a id="pview" href="#" target="_blank" rel="noopener">Go to Product</a>
+    <div id="psizes"></div>
+    <button id="pbuy">Buy Now</button>
   </div>
 </div>
 <div id="load">
@@ -407,32 +413,52 @@ for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=M
   c.position.set(nx*(fr-0.045),PROD_Y,nz*(fr-0.045));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,mat);f.userData.idx=i;mat.userData.idx=i;
 }
 /* live Shopify catalogue */
-const SHOP={domain:'voulezvous-9945.myshopify.com',token:'6e0cf7b855cc8f3a88706494a6adfc93',ver:'2024-07'};
+const SHOP={domain:'tr8sqy-hc.myshopify.com',token:'5982b791c1d88a94fe141015ef5a1967',ver:'2024-07'};
 let PRODUCTS=[];
 (async()=>{try{
-  const q='{products(first:30){nodes{title handle onlineStoreUrl featuredImage{url} priceRange{minVariantPrice{amount currencyCode}}}}}';
+  const q='{products(first:30){nodes{title handle featuredImage{url} priceRange{minVariantPrice{amount currencyCode}} variants(first:60){nodes{id title availableForSale price{amount currencyCode}}}}}}';
   const res=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},body:JSON.stringify({query:q})});
   const prods=((await res.json()).data.products.nodes)||[];
-  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&p.featuredImage.url,price:p.priceRange&&p.priceRange.minVariantPrice,url:p.onlineStoreUrl||`https://${SHOP.domain}/products/${p.handle}`}));
+  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&p.featuredImage.url,price:p.priceRange&&p.priceRange.minVariantPrice,handle:p.handle,
+    variants:((p.variants&&p.variants.nodes)||[]).map(v=>({id:v.id,label:v.title,available:v.availableForSale,price:v.price}))}));
   const tl=new THREE.TextureLoader();tl.setCrossOrigin('anonymous');
   PRODUCTS.forEach((p,i)=>{const cv=artCanvases[i];if(!cv||!p.img)return;tl.load(p.img,t=>{t.encoding=THREE.sRGBEncoding;cv.material=new THREE.MeshBasicMaterial({map:t,toneMapped:false});});});
 }catch(e){console.warn('[VV] products',e);}finally{setProg(100,'The gallery awaits');}})();
 
 /* ── product panel ── */
-const panel=document.getElementById('panel'),pimg=document.getElementById('pimg'),ptitle=document.getElementById('ptitle'),pprice=document.getElementById('pprice'),pview=document.getElementById('pview');
+const panel=document.getElementById('panel'),pimg=document.getElementById('pimg'),ptitle=document.getElementById('ptitle'),pprice=document.getElementById('pprice'),psizes=document.getElementById('psizes'),pbuy=document.getElementById('pbuy');
 document.getElementById('pclose').onclick=()=>panel.classList.remove('open');
 panel.addEventListener('click',e=>{if(e.target===panel)panel.classList.remove('open');}); // tap outside the card to close
 const fmt={USD:'$',EUR:'€',GBP:'£',PKR:'₨',AED:'AED ',INR:'₹'};
 function money(m){if(!m)return'';const s=fmt[m.currencyCode]||(m.currencyCode+' ');return s+Math.round(parseFloat(m.amount)).toLocaleString();}
+let curProduct=null,curVariant=null;
+function selectVariant(v,btn){curVariant=v;[...psizes.children].forEach(c=>c.classList.remove('on'));if(btn)btn.classList.add('on');pprice.textContent=money(v?v.price:(curProduct&&curProduct.price));}
+function openPanel(p){
+  curProduct=p;curVariant=null;ptitle.textContent=p.title||'Voulez-Vous';
+  if(p.img){pimg.src=p.img;pimg.style.display='';}else pimg.style.display='none';
+  psizes.innerHTML='';
+  (p.variants||[]).forEach(v=>{const b=document.createElement('button');b.className='psize';b.textContent=v.label;b.disabled=!v.available;b.onclick=()=>selectVariant(v,b);b._v=v;psizes.appendChild(b);});
+  const first=[...psizes.children].find(c=>!c.disabled);
+  if(first)selectVariant(first._v,first);else pprice.textContent=money(p.price);
+  pbuy.disabled=false;pbuy.textContent='Buy Now';
+  panel.classList.add('open');
+}
+pbuy.onclick=async()=>{
+  if(!curVariant)return;
+  pbuy.disabled=true;pbuy.textContent='Preparing checkout…';
+  try{
+    const r=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},body:JSON.stringify({query:`mutation{cartCreate(input:{lines:[{quantity:1,merchandiseId:"${curVariant.id}"}]}){cart{checkoutUrl}userErrors{message}}}`})});
+    const d=await r.json();const url=d&&d.data&&d.data.cartCreate&&d.data.cartCreate.cart&&d.data.cartCreate.cart.checkoutUrl;
+    if(url){window.location.href=url;}else{pbuy.textContent='Try again';pbuy.disabled=false;}
+  }catch(e){pbuy.textContent='Try again';pbuy.disabled=false;}
+};
 const ray=new THREE.Raycaster();
 function pick(x,y){
   const ndc=new THREE.Vector2((x/innerWidth)*2-1,-(y/innerHeight)*2+1);
   ray.setFromCamera(ndc,camera);
   const hit=ray.intersectObjects(picks,false)[0];
   if(!hit)return;const p=PRODUCTS[hit.object.userData.idx];if(!p)return;
-  ptitle.textContent=p.title||'Voulez-Vous';pprice.textContent=money(p.price);
-  if(p.img){pimg.src=p.img;pimg.style.display='';}else pimg.style.display='none';
-  pview.href=p.url||'#';panel.classList.add('open');
+  openPanel(p);
 }
 
 /* ── ENTRANCE: landing + VV branding easel ── */
