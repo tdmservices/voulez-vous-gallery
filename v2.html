@@ -69,6 +69,32 @@ canvas{display:block}
 #pbuy{display:block;width:100%;padding:15px;background:var(--gold);color:#141414;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;border:none;border-radius:9px;cursor:pointer;transition:.3s}
 #pbuy:hover{background:#e0c267}
 #pbuy:disabled{opacity:.55;cursor:default}
+#paddbag{display:block;width:100%;padding:14px;background:#141414;color:#fff;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;border:none;border-radius:9px;cursor:pointer;margin-bottom:9px}
+#paddbag:hover{background:#2a2a2a}
+/* ── bag ── */
+#bagbtn{position:fixed;top:16px;right:16px;z-index:30;display:flex;align-items:center;gap:8px;padding:9px 15px;background:rgba(12,12,12,.5);border:1px solid rgba(201,168,74,.4);color:#f1ede5;border-radius:22px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#bagcount{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:#141414;font-size:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+#bag{position:fixed;top:0;right:0;height:100%;width:360px;max-width:90vw;z-index:45;background:#f7f4ed;box-shadow:-12px 0 50px rgba(0,0,0,.4);transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.1,1);display:flex;flex-direction:column}
+#bag.open{transform:none}
+#bag header{display:flex;align-items:center;justify-content:space-between;padding:22px 22px 14px;border-bottom:1px solid #e7e1d2}
+#bag header .t{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:13px;color:#1a1a1a}
+#bag header button{background:none;border:none;font-size:24px;color:#9a958c;cursor:pointer;line-height:1}
+#bagitems{flex:1;overflow-y:auto;padding:4px 22px}
+.bagrow{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #eee6d6}
+.bagrow img{width:58px;height:58px;object-fit:cover;border-radius:6px;background:#fff;border:1px solid #e7e1d2}
+.bagrow .info{flex:1;min-width:0}
+.bagrow .nm{font-size:12px;font-weight:600;letter-spacing:.04em;color:#1a1a1a;text-transform:uppercase}
+.bagrow .sz{font-size:11px;color:#8a857b;margin-top:2px}
+.bagrow .pr{font-family:Georgia,serif;color:#1a1a1a;margin-top:3px}
+.bagrow .qty{display:flex;align-items:center;gap:10px;margin-top:6px}
+.bagrow .qty button{width:22px;height:22px;border:1px solid #d8d2c4;background:#fff;border-radius:5px;cursor:pointer;font-size:13px;line-height:1;color:#1a1a1a}
+.bagrow .rm{background:none;border:none;color:#b0694a;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:7px;padding:0}
+#bag footer{padding:18px 22px 22px;border-top:1px solid #e7e1d2}
+#bag .sub{display:flex;justify-content:space-between;align-items:baseline;color:#1a1a1a;margin-bottom:14px;letter-spacing:.04em;font-size:12px;text-transform:uppercase}
+#bag .sub b{font-family:Georgia,serif;font-weight:400;font-size:18px}
+#bagcheckout{display:block;width:100%;padding:15px;background:var(--gold);color:#141414;letter-spacing:.22em;font-size:12px;font-weight:600;text-transform:uppercase;border:none;border-radius:9px;cursor:pointer}
+#bagcheckout:disabled{opacity:.5;cursor:default}
+#bagempty{text-align:center;color:#a39d92;font-size:11px;letter-spacing:.12em;padding:46px 0;text-transform:uppercase}
 </style></head>
 <body>
 <canvas id="c"></canvas>
@@ -84,8 +110,18 @@ canvas{display:block}
     <div id="ptitle"></div>
     <div id="pprice"></div>
     <div id="psizes"></div>
+    <button id="paddbag">Add to Bag</button>
     <button id="pbuy">Buy Now</button>
   </div>
+</div>
+<button id="bagbtn">Bag <span id="bagcount">0</span></button>
+<div id="bag">
+  <header><span class="t">Your Bag</span><button id="bagclose">&times;</button></header>
+  <div id="bagitems"></div>
+  <footer>
+    <div class="sub"><span>Subtotal</span><b id="bagsub">—</b></div>
+    <button id="bagcheckout">Checkout</button>
+  </footer>
 </div>
 <div id="load">
   <img class="blogo" src="assets/vv-logo.jpg" alt="Voulez-Vous — Born To Win">
@@ -452,6 +488,43 @@ pbuy.onclick=async()=>{
     if(url){window.location.href=url;}else{pbuy.textContent='Try again';pbuy.disabled=false;}
   }catch(e){pbuy.textContent='Try again';pbuy.disabled=false;}
 };
+/* ── bag (persistent, multi-item checkout) ── */
+const bagEl=document.getElementById('bag'),bagItemsEl=document.getElementById('bagitems'),bagCountEl=document.getElementById('bagcount'),bagSubEl=document.getElementById('bagsub'),bagCheckout=document.getElementById('bagcheckout');
+let BAG=[];try{BAG=JSON.parse(localStorage.getItem('vv_bag')||'[]');}catch(e){BAG=[];}
+function saveBag(){try{localStorage.setItem('vv_bag',JSON.stringify(BAG));}catch(e){}}
+function bagCurrency(){return (BAG[0]&&BAG[0].price&&BAG[0].price.currencyCode)||'EUR';}
+function renderBag(){
+  bagCountEl.textContent=BAG.reduce((s,i)=>s+i.qty,0);
+  if(!BAG.length){bagItemsEl.innerHTML='<div id="bagempty">Your bag is empty</div>';bagSubEl.textContent='—';bagCheckout.disabled=true;return;}
+  bagCheckout.disabled=false;bagItemsEl.innerHTML='';let sub=0;
+  BAG.forEach((it,idx)=>{sub+=parseFloat(it.price.amount)*it.qty;
+    const row=document.createElement('div');row.className='bagrow';
+    row.innerHTML=`<img src="${it.img||''}" alt=""><div class="info"><div class="nm">${it.title}</div><div class="sz">Size ${it.size}</div><div class="pr">${money(it.price)}</div><div class="qty"><button data-a="-">−</button><span>${it.qty}</span><button data-a="+">+</button></div><button class="rm">Remove</button></div>`;
+    row.querySelector('[data-a="-"]').onclick=()=>{it.qty--;if(it.qty<=0)BAG.splice(idx,1);saveBag();renderBag();};
+    row.querySelector('[data-a="+"]').onclick=()=>{it.qty++;saveBag();renderBag();};
+    row.querySelector('.rm').onclick=()=>{BAG.splice(idx,1);saveBag();renderBag();};
+    bagItemsEl.appendChild(row);});
+  bagSubEl.textContent=money({amount:sub,currencyCode:bagCurrency()});
+}
+function addToBag(){
+  if(!curVariant||!curProduct)return;
+  const ex=BAG.find(i=>i.variantId===curVariant.id);
+  if(ex)ex.qty++; else BAG.push({variantId:curVariant.id,title:curProduct.title,size:curVariant.label,price:curVariant.price,img:curProduct.img,qty:1});
+  saveBag();renderBag();
+}
+document.getElementById('paddbag').onclick=()=>{addToBag();const b=document.getElementById('paddbag');b.textContent='Added ✓';setTimeout(()=>b.textContent='Add to Bag',1100);};
+document.getElementById('bagbtn').onclick=()=>{renderBag();bagEl.classList.add('open');};
+document.getElementById('bagclose').onclick=()=>bagEl.classList.remove('open');
+bagCheckout.onclick=async()=>{
+  if(!BAG.length)return;bagCheckout.disabled=true;bagCheckout.textContent='Preparing checkout…';
+  try{
+    const lines=BAG.map(i=>`{quantity:${i.qty},merchandiseId:"${i.variantId}"}`).join(',');
+    const r=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},body:JSON.stringify({query:`mutation{cartCreate(input:{lines:[${lines}]}){cart{checkoutUrl}userErrors{message}}}`})});
+    const d=await r.json();const url=d&&d.data&&d.data.cartCreate&&d.data.cartCreate.cart&&d.data.cartCreate.cart.checkoutUrl;
+    if(url){window.location.href=url;}else{bagCheckout.textContent='Try again';bagCheckout.disabled=false;}
+  }catch(e){bagCheckout.textContent='Try again';bagCheckout.disabled=false;}
+};
+renderBag();
 const ray=new THREE.Raycaster();
 function pick(x,y){
   const ndc=new THREE.Vector2((x/innerWidth)*2-1,-(y/innerHeight)*2+1);
