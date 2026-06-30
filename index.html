@@ -450,16 +450,16 @@ for(let q=0;q<4;q++){const a=q/4*Math.PI*2+Math.PI/4;
 
 /* ── PRODUCT DISPLAYS on inner piers: slim black-framed prints (face the centre) ── */
 const blackFrameMat=new THREE.MeshStandardMaterial({color:0x111111,roughness:.45,metalness:.25,envMapIntensity:.6});
-const matWhiteMat=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false});
+const matWhiteMat=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
 const artCanvases=[],picks=[];
 const PROD_Y=2.0;
 for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=Math.cos(a);
   const f=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.55,0.06),blackFrameMat);f.position.set(nx*fr,PROD_Y,nz*fr);f.rotation.y=a+Math.PI;scene.add(f);
-  // white mat backing → transparent-PNG areas sit on white (not black), and the image edge meets white (no hard zip)
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(1.49,1.49),matWhiteMat);back.position.set(nx*(fr-0.03),PROD_Y,nz*(fr-0.03));back.rotation.y=a+Math.PI;back.userData.idx=i;scene.add(back);
-  // product image (transparent, aspect-fit on load) on the white mat
-  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false}));
-  c.position.set(nx*(fr-0.045),PROD_Y,nz*(fr-0.045));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,back);f.userData.idx=i;
+  // white mat backing — sits clearly IN FRONT of the frame face (no z-fight/flicker)
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(1.49,1.49),matWhiteMat);back.position.set(nx*(fr-0.05),PROD_Y,nz*(fr-0.05));back.rotation.y=a+Math.PI;back.userData.idx=i;scene.add(back);
+  // product image (transparent, aspect-fit on load) in front of the mat
+  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));
+  c.position.set(nx*(fr-0.075),PROD_Y,nz*(fr-0.075));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,back);f.userData.idx=i;
 }
 /* live Shopify catalogue */
 const SHOP={domain:'tr8sqy-hc.myshopify.com',token:'5982b791c1d88a94fe141015ef5a1967',ver:'2024-07'};
@@ -475,7 +475,7 @@ let PRODUCTS=[];
   const maxAniso=renderer.capabilities.getMaxAnisotropy();
   PRODUCTS.forEach((p,i)=>{const cv=artCanvases[i];if(!cv||!p.img)return;tl.load(p.img,t=>{
     t.encoding=THREE.sRGBEncoding;t.anisotropy=maxAniso;t.minFilter=THREE.LinearFilter;t.magFilter=THREE.LinearFilter;t.generateMipmaps=false;t.needsUpdate=true;
-    cv.material=new THREE.MeshBasicMaterial({map:t,transparent:true,alphaTest:0.5,toneMapped:false}); // respect PNG transparency → no black patches
+    cv.material=new THREE.MeshBasicMaterial({map:t,transparent:true,alphaTest:0.5,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}); // respect PNG transparency → no black patches; offset → no flicker
     const im=t.image;if(im&&im.width&&im.height){const ar=im.width/im.height;let w=1.4,h=1.4;if(ar>=1)h=1.4/ar;else w=1.4*ar;cv.scale.set(w/1.4,h/1.4,1);} // fit real aspect ratio (no stretch)
   });});
 }catch(e){console.warn('[VV] products',e);}finally{setProg(100,'The gallery awaits');}})();
