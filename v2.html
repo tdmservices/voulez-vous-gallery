@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <!-- build: pass3 product card + black frames -->
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Voulez-Vous — Rotunda v2</title>
+<title>Voulez-Vous — Born To Win</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -156,7 +158,7 @@ body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,b
 <script>
 const canvas=document.getElementById('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); // sharper edges (less aliasing on product frames)
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=THREE.sRGBEncoding;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -448,17 +450,13 @@ for(let q=0;q<4;q++){const a=q/4*Math.PI*2+Math.PI/4;
 
 /* ── PRODUCT DISPLAYS on inner piers: slim black-framed prints (face the centre) ── */
 const blackFrameMat=new THREE.MeshStandardMaterial({color:0x111111,roughness:.45,metalness:.25,envMapIntensity:.6});
-const matBoardMat=new THREE.MeshStandardMaterial({color:0x141414,roughness:.55,metalness:.15}); // BLACK frame backing (was white)
 const artCanvases=[],picks=[];
 const PROD_Y=2.0;
 for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=Math.cos(a);
-  // slim black frame
-  const f=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,0.05),blackFrameMat);f.position.set(nx*fr,PROD_Y,nz*fr);f.rotation.y=a+Math.PI;scene.add(f);
-  // white mat board, inset → leaves a thin black frame border
-  const mat=new THREE.Mesh(new THREE.PlaneGeometry(1.36,1.36),matBoardMat);mat.position.set(nx*(fr-0.03),PROD_Y,nz*(fr-0.03));mat.rotation.y=a+Math.PI;scene.add(mat);
-  // product image, inset on the mat
-  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.18,1.18),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
-  c.position.set(nx*(fr-0.045),PROD_Y,nz*(fr-0.045));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,mat);f.userData.idx=i;mat.userData.idx=i;
+  // thin black frame, image fills it (less hard border → less edge aliasing)
+  const f=new THREE.Mesh(new THREE.BoxGeometry(1.52,1.52,0.06),blackFrameMat);f.position.set(nx*fr,PROD_Y,nz*fr);f.rotation.y=a+Math.PI;scene.add(f);
+  const c=new THREE.Mesh(new THREE.PlaneGeometry(1.44,1.44),new THREE.MeshBasicMaterial({color:0xf2f2f0,toneMapped:false}));
+  c.position.set(nx*(fr-0.035),PROD_Y,nz*(fr-0.035));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f);f.userData.idx=i;
 }
 /* live Shopify catalogue */
 const SHOP={domain:'tr8sqy-hc.myshopify.com',token:'5982b791c1d88a94fe141015ef5a1967',ver:'2024-07'};
@@ -471,7 +469,8 @@ let PRODUCTS=[];
     options:((p.options)||[]).map(o=>({name:o.name,values:o.values})),
     variants:((p.variants&&p.variants.nodes)||[]).map(v=>({id:v.id,label:v.title,available:v.availableForSale,price:v.price,opts:Object.fromEntries(((v.selectedOptions)||[]).map(s=>[s.name,s.value]))}))}));
   const tl=new THREE.TextureLoader();tl.setCrossOrigin('anonymous');
-  PRODUCTS.forEach((p,i)=>{const cv=artCanvases[i];if(!cv||!p.img)return;tl.load(p.img,t=>{t.encoding=THREE.sRGBEncoding;cv.material=new THREE.MeshBasicMaterial({map:t,toneMapped:false});});});
+  const maxAniso=renderer.capabilities.getMaxAnisotropy();
+  PRODUCTS.forEach((p,i)=>{const cv=artCanvases[i];if(!cv||!p.img)return;tl.load(p.img,t=>{t.encoding=THREE.sRGBEncoding;t.anisotropy=maxAniso;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;cv.material=new THREE.MeshBasicMaterial({map:t,toneMapped:false});});});
 }catch(e){console.warn('[VV] products',e);}finally{setProg(100,'The gallery awaits');}})();
 
 /* ── product panel ── */
