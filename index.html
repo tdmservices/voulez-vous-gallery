@@ -175,9 +175,9 @@ const camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,0.1,500);
 const GOLD=0xc9a84a, BLACK=0x141414, IVORY=0xe9e3d6, WHITE=0xf6f3ec;
 
 /* ── DIMENSIONS: two concentric rings ── */
-const R_OUT=19, R_IN=11, RB=R_OUT+2.75; // bigger, more spacious rotunda (RB = terrace / balustrade radius)
+const R_OUT=21.5, R_IN=13.5, RB=R_OUT+2.75; // larger rotunda (RB = terrace / balustrade radius)
 const H=8, DRUM=2.2;
-const N_OUT=14, N_IN=16;
+const N_OUT=16, N_IN=20; // 20 inner pillars/product frames (was 16) — room for the new pieces
 const stepO=Math.PI*2/N_OUT, stepI=Math.PI*2/N_IN;
 
 /* ── camera poses: cinematic fly-in start → eye-level spawn ── */
@@ -323,8 +323,8 @@ const swag=new THREE.Mesh(new THREE.TorusGeometry(1.12,0.04,8,48),frameG);swag.r
 for(let i=0;i<26;i++){const a=i/26*Math.PI*2;const b=new THREE.Mesh(new THREE.OctahedronGeometry(0.05,0),crystal);b.position.set(Math.cos(a)*1.12,-0.02-Math.abs(Math.sin(i*1.9))*0.14,Math.sin(a)*1.12);chand.add(b);}
 const fcap=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.05,0.34,12),frameG);fcap.position.y=-0.42;chand.add(fcap);
 const finial=new THREE.Mesh(new THREE.OctahedronGeometry(0.17,0),crystal);finial.position.y=-0.72;chand.add(finial);
-chand.scale.setScalar(2.15);chand.position.set(0,H+2.0,0);scene.add(chand);
-const chLight=new THREE.PointLight(0xffe9bd,58,55,2);chLight.position.set(0,H+1,0);scene.add(chLight);
+chand.scale.setScalar(2.5);chand.position.set(0,H+2.0,0);scene.add(chand);
+const chLight=new THREE.PointLight(0xffe9bd,64,66,2);chLight.position.set(0,H+1,0);scene.add(chLight);
 
 /* ── FLOOR: one unified flagstone / crazy-paving floor everywhere (inner rotunda + terrace + entrance) ── */
 function floorTex(){
