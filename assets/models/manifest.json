@@ -2,156 +2,218 @@
  {
   "name": "Angel Full Moon Black",
   "male": "assets/models/male/angel-full-moon-black.glb",
-  "female": "assets/models/female/angel-full-moon-black.glb"
+  "female": "assets/models/female/angel-full-moon-black.glb",
+  "handle": "full-moon",
+  "primary": true
  },
  {
   "name": "Black Angel",
   "male": "assets/models/male/black-angel.glb",
-  "female": "assets/models/female/black-angel.glb"
+  "female": "assets/models/female/black-angel.glb",
+  "handle": "baby-angel",
+  "primary": true
  },
  {
   "name": "Black Sunset",
   "male": "assets/models/male/black-sunset.glb",
-  "female": "assets/models/female/black-sunset.glb"
+  "female": "assets/models/female/black-sunset.glb",
+  "handle": "te-amo",
+  "primary": false
  },
  {
   "name": "Black With Red Artwork",
   "male": null,
-  "female": "assets/models/female/black-with-red-artwork.glb"
+  "female": "assets/models/female/black-with-red-artwork.glb",
+  "handle": "untitled-3",
+  "primary": true
  },
  {
   "name": "Blue Heart",
   "male": "assets/models/male/blue-heart.glb",
-  "female": "assets/models/female/blue-heart.glb"
+  "female": "assets/models/female/blue-heart.glb",
+  "handle": "rose-heart",
+  "primary": false
  },
  {
   "name": "Brownish",
   "male": "assets/models/male/brownish.glb",
-  "female": "assets/models/female/brownish.glb"
+  "female": "assets/models/female/brownish.glb",
+  "handle": "untitled-1",
+  "primary": true
  },
  {
   "name": "Dark Blue",
   "male": "assets/models/male/dark-blue.glb",
-  "female": "assets/models/female/dark-blue.glb"
+  "female": "assets/models/female/dark-blue.glb",
+  "handle": "embrace-the-ocean",
+  "primary": false
  },
  {
   "name": "Dark Blue 2",
   "male": "assets/models/male/dark-blue-2.glb",
-  "female": "assets/models/female/dark-blue-2.glb"
+  "female": "assets/models/female/dark-blue-2.glb",
+  "handle": "tsunami-flows",
+  "primary": true
  },
  {
   "name": "Dark Blue Hoodie",
   "male": "assets/models/male/dark-blue-hoodie.glb",
-  "female": "assets/models/female/dark-blue-hoodie.glb"
+  "female": "assets/models/female/dark-blue-hoodie.glb",
+  "handle": "embrace-the-ocean",
+  "primary": true
  },
  {
   "name": "Dark Blue Hoodie 2",
   "male": "assets/models/male/dark-blue-hoodie-2.glb",
-  "female": "assets/models/female/dark-blue-hoodie-2.glb"
+  "female": "assets/models/female/dark-blue-hoodie-2.glb",
+  "handle": "tsunami-flows",
+  "primary": false
  },
  {
   "name": "Dark Pink",
   "male": "assets/models/male/dark-pink.glb",
-  "female": "assets/models/female/dark-pink.glb"
+  "female": "assets/models/female/dark-pink.glb",
+  "handle": "garden-of-grace",
+  "primary": false
  },
  {
   "name": "Heart Pink",
   "male": "assets/models/male/heart-pink.glb",
-  "female": "assets/models/female/heart-pink.glb"
+  "female": "assets/models/female/heart-pink.glb",
+  "handle": "rose-heart",
+  "primary": true
  },
  {
   "name": "Light Blue",
   "male": "assets/models/male/light-blue.glb",
-  "female": "assets/models/female/light-blue.glb"
+  "female": "assets/models/female/light-blue.glb",
+  "handle": "the-gateway",
+  "primary": false
  },
  {
   "name": "Light Blue Hoodie",
   "male": "assets/models/male/light-blue-hoodie.glb",
-  "female": "assets/models/female/light-blue-hoodie.glb"
+  "female": "assets/models/female/light-blue-hoodie.glb",
+  "handle": "the-gateway",
+  "primary": true
  },
  {
   "name": "Light Cream",
   "male": "assets/models/male/light-cream.glb",
-  "female": "assets/models/female/light-cream.glb"
+  "female": "assets/models/female/light-cream.glb",
+  "handle": "monaco",
+  "primary": true
  },
  {
   "name": "Light Cream 2",
   "male": "assets/models/male/light-cream-2.glb",
-  "female": "assets/models/female/light-cream-2.glb"
+  "female": "assets/models/female/light-cream-2.glb",
+  "handle": "earn-your-stripes",
+  "primary": true
  },
  {
   "name": "Light Pink",
   "male": "assets/models/male/light-pink.glb",
-  "female": "assets/models/female/light-pink.glb"
+  "female": "assets/models/female/light-pink.glb",
+  "handle": "drink-with-class",
+  "primary": true
  },
  {
   "name": "Light Pink 2",
   "male": "assets/models/male/light-pink-2.glb",
-  "female": "assets/models/female/light-pink-2.glb"
+  "female": "assets/models/female/light-pink-2.glb",
+  "handle": "garden-of-grace",
+  "primary": true
  },
  {
   "name": "Light Pink 3",
   "male": "assets/models/male/light-pink-3.glb",
-  "female": "assets/models/female/light-pink-3.glb"
+  "female": "assets/models/female/light-pink-3.glb",
+  "handle": "sky-rose",
+  "primary": true
  },
  {
   "name": "Light Pink Hoodie",
   "male": "assets/models/male/light-pink-hoodie.glb",
-  "female": "assets/models/female/light-pink-hoodie.glb"
+  "female": "assets/models/female/light-pink-hoodie.glb",
+  "handle": "drink-with-class",
+  "primary": false
  },
  {
   "name": "Orange",
   "male": "assets/models/male/orange.glb",
-  "female": "assets/models/female/orange.glb"
+  "female": "assets/models/female/orange.glb",
+  "handle": "te-amo",
+  "primary": true
  },
  {
   "name": "Orange 2",
   "male": "assets/models/male/orange-2.glb",
-  "female": "assets/models/female/orange-2.glb"
+  "female": "assets/models/female/orange-2.glb",
+  "handle": "te-amo",
+  "primary": false
  },
  {
   "name": "Red",
   "male": "assets/models/male/red.glb",
-  "female": "assets/models/female/red.glb"
+  "female": "assets/models/female/red.glb",
+  "handle": "hope-never-dies",
+  "primary": false
  },
  {
   "name": "Red 2",
   "male": "assets/models/male/red-2.glb",
-  "female": "assets/models/female/red-2.glb"
+  "female": "assets/models/female/red-2.glb",
+  "handle": "hope-never-dies",
+  "primary": true
  },
  {
   "name": "Taj Mahel Blue",
   "male": "assets/models/male/taj-mahel-blue.glb",
-  "female": "assets/models/female/taj-mahel-blue.glb"
+  "female": "assets/models/female/taj-mahel-blue.glb",
+  "handle": "the-taj-mahal",
+  "primary": true
  },
  {
   "name": "Taj Mahel Brown",
   "male": "assets/models/male/taj-mahel-brown.glb",
-  "female": "assets/models/female/taj-mahel-brown.glb"
+  "female": "assets/models/female/taj-mahel-brown.glb",
+  "handle": "the-taj-mahal",
+  "primary": false
  },
  {
   "name": "Vouz Vouz Black",
   "male": "assets/models/male/vouz-vouz-black.glb",
-  "female": "assets/models/female/vouz-vouz-black.glb"
+  "female": "assets/models/female/vouz-vouz-black.glb",
+  "handle": "untitled-5",
+  "primary": true
  },
  {
   "name": "Wear Your Legacy",
   "male": "assets/models/male/wear-your-legacy.glb",
-  "female": "assets/models/female/wear-your-legacy.glb"
+  "female": "assets/models/female/wear-your-legacy.glb",
+  "handle": "wear-your-legacy",
+  "primary": true
  },
  {
   "name": "Wear Your Tribe",
   "male": "assets/models/male/wear-your-tribe.glb",
-  "female": "assets/models/female/wear-your-tribe.glb"
+  "female": "assets/models/female/wear-your-tribe.glb",
+  "handle": "wear-your-tribe",
+  "primary": true
  },
  {
   "name": "White With Angel",
   "male": "assets/models/male/white-with-angel.glb",
-  "female": "assets/models/female/white-with-angel.glb"
+  "female": "assets/models/female/white-with-angel.glb",
+  "handle": "baby-angel",
+  "primary": false
  },
  {
   "name": "White With Pink Artwork",
   "male": "assets/models/male/white-with-pink-artwork.glb",
-  "female": "assets/models/female/white-with-pink-artwork.glb"
+  "female": "assets/models/female/white-with-pink-artwork.glb",
+  "handle": "tennis",
+  "primary": true
  }
 ]

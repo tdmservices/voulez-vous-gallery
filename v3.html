@@ -478,7 +478,10 @@ for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=M
   const c=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));
   c.position.set(nx*(fr-0.075),PROD_Y,nz*(fr-0.075));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,back);f.userData.idx=i;
 }
-/* ── STAGING: gender-aware mannequin pedestals on all 20 slots ── */
+/* ── gender-aware mannequin pedestals on all 20 slots ── */
+const IS_MOBILE=(navigator.maxTouchPoints>0&&Math.min(innerWidth,innerHeight)<900)||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+if(IS_MOBILE)renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); // phones: fill-rate relief
+const NEAR_DIST=17;                        // mobile: only load pedestals within this range
 const TARGET_H=1.8;
 let GENDER='female';                       // chosen on the intro screen; flips via the HUD pill
 const PEDS=[];                             // {slot,a,px,pz,models:{male,female},loading:{}}
@@ -500,10 +503,18 @@ function prepModel(m,ped){                 // strip junk plane, scale, place, wh
   m.traverse(o=>{ if(o.isMesh){
     (Array.isArray(o.material)?o.material:[o.material]).forEach(mat=>{ if(!mat)return;
       if(/body/i.test(mat.name||'')){mat.color&&mat.color.set(0xefeae2);if('roughness'in mat)mat.roughness=0.5;}
-      if(mat.map){mat.map.anisotropy=maxAniso;mat.map.needsUpdate=true;}
+      if(mat.map){mat.map.anisotropy=IS_MOBILE?Math.min(4,maxAniso):maxAniso;mat.map.needsUpdate=true;}
     });
   }});
   return m;
+}
+function disposeModel(m){ // mobile memory relief when flipping gender
+  m.traverse(o=>{ if(o.isMesh){ o.geometry.dispose();
+    (Array.isArray(o.material)?o.material:[o.material]).forEach(mt=>{ if(!mt)return;
+      ['map','normalMap','roughnessMap','metalnessMap','aoMap','emissiveMap'].forEach(k=>{if(mt[k])mt[k].dispose();});
+      mt.dispose(); });
+  }});
+  scene.remove(m);
 }
 
 /* simple 2-at-a-time load queue, nearest-to-entrance first */
@@ -523,25 +534,36 @@ function pump(){
     },undefined,err=>{inFlight--;job.ped.loading[job.g]=false;console.warn('[VV] load failed',job.file,err);pump();});
   }
 }
-function queueGender(g){
-  PEDS.forEach(ped=>{const f=ped.design[g];if(f&&!ped.models[g]&&!ped.loading[g])loadQ.push({ped,g,file:f});});
+function pedNear(ped){const dx=camera.position.x-ped.px,dz=camera.position.z-ped.pz;return Math.hypot(dx,dz)<NEAR_DIST;}
+function queueGender(g,proximityOnly){
+  PEDS.forEach(ped=>{
+    const f=ped.design[g];
+    if(!f||ped.models[g]||ped.loading[g])return;
+    if(proximityOnly&&!pedNear(ped))return;
+    if(loadQ.some(j=>j.ped===ped&&j.g===g))return;
+    loadQ.push({ped,g,file:f});
+  });
   pump();
 }
 function setGender(g){
-  if(g!==GENDER){GENDER=g;
+  if(g!==GENDER){
+    const old=GENDER;GENDER=g;
     vvModels=[];
     PEDS.forEach(ped=>{
-      for(const k of ['male','female']){const m=ped.models[k];if(m){m.visible=(k===g);if(m.visible)vvModels.push(m);}}
+      const eff=ped.design[g]?g:(ped.design.male?'male':'female'); // gender file missing → other gender stands in
+      for(const k of ['male','female']){const m=ped.models[k];if(m){m.visible=(k===eff);if(m.visible)vvModels.push(m);}}
+      if(IS_MOBILE&&old!==eff&&ped.models[old]){disposeModel(ped.models[old]);ped.models[old]=null;} // free GPU memory on phones
     });
-    queueGender(g);                        // fetch any not-yet-loaded models of this gender
+    queueGender(g,IS_MOBILE);              // fetch missing models of this gender (near-only on mobile)
   }
   document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
 }
 document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.onclick=()=>setGender(b.dataset.g));
 
 fetch('assets/models/manifest.json').then(r=>r.json()).then(designs=>{
-  const paired=designs.filter(d=>d.male&&d.female);
-  // 20 featured designs on the 20 inner slots, ordered so the first ones flank the entrance (a≈0 is +Z)
+  // the 20 primary designs — one per Shopify product, tap opens the RIGHT product (design.handle)
+  const paired=designs.filter(d=>d.primary&&(d.male||d.female)); // a design missing one gender still gets its pedestal (other gender stands in)
+  // ordered so the first ones flank the entrance (a≈0 is +Z)
   const order=[...Array(N_IN).keys()].sort((i,j)=>{
     const da=Math.min((i+0.5)*stepI,Math.PI*2-(i+0.5)*stepI), db=Math.min((j+0.5)*stepI,Math.PI*2-(j+0.5)*stepI);
     return da-db;});
@@ -554,11 +576,16 @@ fetch('assets/models/manifest.json').then(r=>r.json()).then(designs=>{
     plinth.position.set(ped.px,0.175,ped.pz);scene.add(plinth);
     [picks[slot*3],picks[slot*3+1],picks[slot*3+2]].forEach(o=>{if(o)o.visible=false;});
     const prox=new THREE.Mesh(new THREE.BoxGeometry(1.1,2.0,0.7),new THREE.MeshBasicMaterial({visible:false}));
-    prox.position.set(ped.px,1.35,ped.pz);prox.userData.idx=slot;scene.add(prox);picks.push(prox);
+    prox.position.set(ped.px,1.35,ped.pz);prox.userData.handle=paired[k].handle;scene.add(prox);picks.push(prox);
     PEDS.push(ped);
   });
-  queueGender(GENDER);                     // active gender loads first (nearest pedestals first)
-  setTimeout(()=>queueGender(GENDER==='female'?'male':'female'),9000); // then pre-warm the other, after the rush
+  if(IS_MOBILE){
+    queueGender(GENDER,true);              // phones: only what's near the entrance now
+    setInterval(()=>queueGender(GENDER,true),800); // stream the rest in as the visitor walks
+  }else{
+    queueGender(GENDER);                   // desktop: everything, nearest first
+    setTimeout(()=>queueGender(GENDER==='female'?'male':'female'),9000); // pre-warm the other gender
+  }
 }).catch(e=>console.warn('[VV] manifest',e));
 /* live Shopify catalogue */
 const SHOP={domain:'tr8sqy-hc.myshopify.com',token:'5982b791c1d88a94fe141015ef5a1967',ver:'2024-07'};
@@ -662,7 +689,10 @@ function pick(x,y){
   const ndc=new THREE.Vector2((x/innerWidth)*2-1,-(y/innerHeight)*2+1);
   ray.setFromCamera(ndc,camera);
   const hit=ray.intersectObjects(picks,false)[0];
-  if(!hit)return;const p=PRODUCTS[hit.object.userData.idx];if(!p)return;
+  if(!hit)return;
+  const ud=hit.object.userData;
+  const p=ud.handle?PRODUCTS.find(x=>x.handle===ud.handle):PRODUCTS[ud.idx]; // mannequins resolve by product handle
+  if(!p)return;
   openPanel(p);
 }
 
