@@ -99,14 +99,14 @@
  },
  {
   "name": "Light Cream",
-  "male": "assets/models/male/light-cream.glb",
+  "male": "assets/models/male/light-cream-2.glb",
   "female": "assets/models/female/light-cream.glb",
   "handle": "monaco",
   "primary": true
  },
  {
   "name": "Light Cream 2",
-  "male": "assets/models/male/light-cream-2.glb",
+  "male": "assets/models/male/light-cream.glb",
   "female": "assets/models/female/light-cream-2.glb",
   "handle": "earn-your-stripes",
   "primary": true
