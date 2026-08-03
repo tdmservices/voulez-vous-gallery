@@ -560,7 +560,7 @@ function setGender(g){
 }
 document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.onclick=()=>setGender(b.dataset.g));
 
-fetch('assets/models/manifest.json').then(r=>r.json()).then(designs=>{
+fetch('assets/models/manifest.json?v=2').then(r=>r.json()).then(designs=>{ // ?v= busts the year-long assets cache — bump when the manifest changes
   // the 20 primary designs — one per Shopify product, tap opens the RIGHT product (design.handle)
   const paired=designs.filter(d=>d.primary&&(d.male||d.female)); // a design missing one gender still gets its pedestal (other gender stands in)
   // ordered so the first ones flank the entrance (a≈0 is +Z)
