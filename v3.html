@@ -486,7 +486,7 @@ for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=M
 const IS_MOBILE=(navigator.maxTouchPoints>0&&Math.min(innerWidth,innerHeight)<900)||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 if(IS_MOBILE)renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); // phones: fill-rate relief
 if(IS_MOBILE)document.getElementById('hint').innerHTML='left stick · walk &nbsp;·&nbsp; right · look &nbsp;·&nbsp; tap a piece'; // short one-liner, no WASD on touch
-const NEAR_DIST=17;                        // mobile: only load pedestals within this range
+const NEAR_DIST=34;                        // mobile: covers the whole rotunda — nearest pedestals still load first, none stay empty
 const TARGET_H=1.8;
 let GENDER='female';                       // chosen on the intro screen; flips via the HUD pill
 const PEDS=[];                             // {slot,a,px,pz,models:{male,female},loading:{}}
@@ -597,14 +597,8 @@ fetch('assets/models/manifest.json?v=3').then(r=>r.json()).then(designs=>{ // ?v
   if(IS_MOBILE){
     queueGender(GENDER,true);              // phones: only what's near the entrance now
     setInterval(()=>{
-      const busy=move.x||move.y||look.x||look.y||dragId!==null||Object.values(keys).some(Boolean);
-      if(!busy)queueGender(GENDER,true);   // stream new models only while the visitor pauses (no decode jank mid-walk)
-      // far-unload: cap live models so long sessions never exhaust phone GPU memory (the crash-reboot)
-      let live=PEDS.filter(p=>p.models[GENDER]).length;
-      if(live>10)PEDS.forEach(p=>{
-        const m=p.models[GENDER];if(!m)return;
-        if(live>10&&Math.hypot(camera.position.x-p.px,camera.position.z-p.pz)>26){disposeModel(m);p.models[GENDER]=null;const i=vvModels.indexOf(m);if(i>=0)vvModels.splice(i,1);live--;}
-      });
+      const walking=move.x||move.y||keys['w']||keys['a']||keys['s']||keys['d']; // only WALKING defers loads; looking around doesn't
+      if(!walking)queueGender(GENDER,true); // all 20 fill in nearest-first, so no pedestal stays empty
     },800);
   }else{
     queueGender(GENDER);                   // desktop: everything, nearest first
