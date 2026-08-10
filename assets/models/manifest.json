@@ -22,7 +22,7 @@
  },
  {
   "name": "Black With Red Artwork",
-  "male": null,
+  "male": "assets/models/male/black-with-red-artwork.glb",
   "female": "assets/models/female/black-with-red-artwork.glb",
   "handle": "untitled-3",
   "primary": true
@@ -106,7 +106,7 @@
  },
  {
   "name": "Light Cream 2",
-  "male": "assets/models/male/light-cream.glb",
+  "male": "assets/models/male/light-cream-stripes-v2.glb",
   "female": "assets/models/female/light-cream-2.glb",
   "handle": "earn-your-stripes",
   "primary": true
@@ -183,7 +183,7 @@
  },
  {
   "name": "Vouz Vouz Black",
-  "male": "assets/models/male/vouz-vouz-black.glb",
+  "male": "assets/models/male/vouz-vouz-black-v2.glb",
   "female": "assets/models/female/vouz-vouz-black.glb",
   "handle": "untitled-5",
   "primary": true

@@ -11,6 +11,7 @@
 canvas{display:block}
 :root{--gold:#c9a84a}
 #hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);color:#cbb88a;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;background:rgba(12,12,12,.42);padding:6px 14px;border-radius:20px;pointer-events:none;z-index:9;border:1px solid rgba(201,168,74,.25)}
+@media(max-width:760px){#hint{bottom:152px;font-size:9.5px;padding:6px 12px;white-space:nowrap;max-width:94vw}} /* phones: sit ABOVE the joysticks, one line */
 #stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10;background:radial-gradient(circle,#9b9b9b 0%,#6b6b6b 100%);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 0 14px rgba(0,0,0,.35)}
 #stick{left:26px}#stickR{right:26px}
 #stick::before,#stickR::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
@@ -18,6 +19,8 @@ canvas{display:block}
 #xh{position:fixed;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(201,168,74,.6);box-shadow:0 0 0 4px rgba(255,255,255,.18);pointer-events:none;z-index:9}
 /* gameplay HUD stays hidden until the fly-in lands (never overlaps the loading/intro) */
 #stick,#stickR,#bagbtn,#xh,#hint,#gsw{opacity:0;transition:opacity .55s ease}
+body{-webkit-tap-highlight-color:transparent}
+#stick,#stickR,#bagbtn,#gsw,#hint,canvas{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 body:not(.playing) #stick,body:not(.playing) #stickR,body:not(.playing) #bagbtn{pointer-events:none}
 body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,body.playing #hint,body.playing #gsw{opacity:1}
 /* ── gender switcher (day/night-style pill) ── */
@@ -208,10 +211,11 @@ let entered=false,flyT=0;
 const keys={},move={x:0,y:0},look={x:0,y:0};
 addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;});
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
-let drag=false,lx=0,ly=0,moved=0;
-canvas.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;moved=0;});
-addEventListener('pointerup',e=>{if(drag&&moved<7&&entered&&flyT>=1)pick(e.clientX,e.clientY);drag=false;});
-addEventListener('pointermove',e=>{if(!drag)return;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);if(entered&&flyT>=1){yaw-=(e.clientX-lx)*0.0028;pitch=Math.max(-0.85,Math.min(1.25,pitch-(e.clientY-ly)*0.0022));}lx=e.clientX;ly=e.clientY;});
+let dragId=null,lx=0,ly=0,moved=0;   // track WHICH pointer owns the look-drag — joystick fingers must never trigger look or pick
+canvas.addEventListener('pointerdown',e=>{if(dragId!==null)return;dragId=e.pointerId;lx=e.clientX;ly=e.clientY;moved=0;});
+addEventListener('pointerup',e=>{if(e.pointerId!==dragId)return;if(moved<7&&e.target===canvas&&entered&&flyT>=1)pick(e.clientX,e.clientY);dragId=null;});
+addEventListener('pointercancel',e=>{if(e.pointerId===dragId)dragId=null;});
+addEventListener('pointermove',e=>{if(e.pointerId!==dragId)return;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);if(entered&&flyT>=1){yaw-=(e.clientX-lx)*0.0028;pitch=Math.max(-0.85,Math.min(1.25,pitch-(e.clientY-ly)*0.0022));}lx=e.clientX;ly=e.clientY;});
 function makeStick(el,knob,t){
   let id=null,cx=0,cy=0;
   const reset=()=>{id=null;t.x=0;t.y=0;knob.style.transform='';};
@@ -481,6 +485,7 @@ for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=M
 /* ── gender-aware mannequin pedestals on all 20 slots ── */
 const IS_MOBILE=(navigator.maxTouchPoints>0&&Math.min(innerWidth,innerHeight)<900)||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 if(IS_MOBILE)renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); // phones: fill-rate relief
+if(IS_MOBILE)document.getElementById('hint').innerHTML='left stick · walk &nbsp;·&nbsp; right · look &nbsp;·&nbsp; tap a piece'; // short one-liner, no WASD on touch
 const NEAR_DIST=17;                        // mobile: only load pedestals within this range
 const TARGET_H=1.8;
 let GENDER='female';                       // chosen on the intro screen; flips via the HUD pill
@@ -503,10 +508,20 @@ function prepModel(m,ped){                 // strip junk plane, scale, place, wh
   m.traverse(o=>{ if(o.isMesh){
     (Array.isArray(o.material)?o.material:[o.material]).forEach(mat=>{ if(!mat)return;
       if(/body/i.test(mat.name||'')){mat.color&&mat.color.set(0xefeae2);if('roughness'in mat)mat.roughness=0.5;}
-      if(mat.map){mat.map.anisotropy=IS_MOBILE?Math.min(4,maxAniso):maxAniso;mat.map.needsUpdate=true;}
+      if(mat.map){
+        if(IS_MOBILE)shrinkTex(mat.map,1024);          // 2K→1K = 4× less GPU memory per map (phones crash-reboot otherwise)
+        mat.map.anisotropy=IS_MOBILE?Math.min(4,maxAniso):maxAniso;mat.map.needsUpdate=true;
+      }
     });
   }});
   return m;
+}
+function shrinkTex(t,max){ // redraw oversized texture images at a phone-safe resolution
+  const im=t.image;if(!im||!im.width||Math.max(im.width,im.height)<=max)return;
+  const s=max/Math.max(im.width,im.height);
+  const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  t.image=c;t.needsUpdate=true;
 }
 function disposeModel(m){ // mobile memory relief when flipping gender
   m.traverse(o=>{ if(o.isMesh){ o.geometry.dispose();
@@ -560,7 +575,7 @@ function setGender(g){
 }
 document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.onclick=()=>setGender(b.dataset.g));
 
-fetch('assets/models/manifest.json?v=2').then(r=>r.json()).then(designs=>{ // ?v= busts the year-long assets cache — bump when the manifest changes
+fetch('assets/models/manifest.json?v=3').then(r=>r.json()).then(designs=>{ // ?v= busts the year-long assets cache — bump when the manifest changes
   // the 20 primary designs — one per Shopify product, tap opens the RIGHT product (design.handle)
   const paired=designs.filter(d=>d.primary&&(d.male||d.female)); // a design missing one gender still gets its pedestal (other gender stands in)
   // ordered so the first ones flank the entrance (a≈0 is +Z)
@@ -581,7 +596,16 @@ fetch('assets/models/manifest.json?v=2').then(r=>r.json()).then(designs=>{ // ?v
   });
   if(IS_MOBILE){
     queueGender(GENDER,true);              // phones: only what's near the entrance now
-    setInterval(()=>queueGender(GENDER,true),800); // stream the rest in as the visitor walks
+    setInterval(()=>{
+      const busy=move.x||move.y||look.x||look.y||dragId!==null||Object.values(keys).some(Boolean);
+      if(!busy)queueGender(GENDER,true);   // stream new models only while the visitor pauses (no decode jank mid-walk)
+      // far-unload: cap live models so long sessions never exhaust phone GPU memory (the crash-reboot)
+      let live=PEDS.filter(p=>p.models[GENDER]).length;
+      if(live>10)PEDS.forEach(p=>{
+        const m=p.models[GENDER];if(!m)return;
+        if(live>10&&Math.hypot(camera.position.x-p.px,camera.position.z-p.pz)>26){disposeModel(m);p.models[GENDER]=null;const i=vvModels.indexOf(m);if(i>=0)vvModels.splice(i,1);live--;}
+      });
+    },800);
   }else{
     queueGender(GENDER);                   // desktop: everything, nearest first
     setTimeout(()=>queueGender(GENDER==='female'?'male':'female'),9000); // pre-warm the other gender
