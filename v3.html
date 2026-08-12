@@ -635,7 +635,7 @@ let PRODUCTS=[];
   const q='{products(first:30){nodes{title handle featuredImage{url} priceRange{minVariantPrice{amount currencyCode}} options{name values} variants(first:100){nodes{id title availableForSale price{amount currencyCode} selectedOptions{name value}}}}}}';
   const res=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},body:JSON.stringify({query:q})});
   const prods=((await res.json()).data.products.nodes)||[];
-  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&p.featuredImage.url,price:p.priceRange&&p.priceRange.minVariantPrice,handle:p.handle,
+  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&(p.featuredImage.url+(p.featuredImage.url.includes('?')?'&':'?')+'width=900'),price:p.priceRange&&p.priceRange.minVariantPrice,handle:p.handle,
     options:((p.options)||[]).map(o=>({name:o.name,values:o.values})),
     variants:((p.variants&&p.variants.nodes)||[]).map(v=>({id:v.id,label:v.title,available:v.availableForSale,price:v.price,opts:Object.fromEntries(((v.selectedOptions)||[]).map(s=>[s.name,s.value]))}))}));
   const tl=new THREE.TextureLoader();tl.setCrossOrigin('anonymous');
