@@ -19,6 +19,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .wordmark{font-size:17px;letter-spacing:.28em;text-transform:uppercase;font-weight:600}
 .wordmark small{display:block;font-size:8px;letter-spacing:.5em;color:#b08d3c;margin-top:3px}
 nav{display:flex;gap:26px;font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+#navbtn{display:none;background:none;border:1px solid #ddd;border-radius:8px;font-size:18px;padding:6px 12px;cursor:pointer;color:#161616}
 nav a:hover{color:#b08d3c}
 .hero{padding:52px 5vw 8px;text-align:center}
 .hero h1{font-size:26px;letter-spacing:.3em;text-transform:uppercase;font-weight:400}
@@ -26,11 +27,11 @@ nav a:hover{color:#b08d3c}
 .rule{width:54px;height:2px;background:#b08d3c;margin:22px auto}
 main{padding:30px 5vw 70px;max-width:1200px;margin:0 auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:34px 26px}
-.card img{width:100%;aspect-ratio:1;object-fit:cover;background:#f6f5f2}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f5f2}
 .card h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-top:13px}
 .card .p{color:#b08d3c;font-size:13px;margin-top:5px;letter-spacing:.08em}
 .pd{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start}
-.pd img{width:100%;aspect-ratio:1;object-fit:cover;background:#f6f5f2}
+.pd img{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f5f2;cursor:pointer}
 .pd h1{font-size:22px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
 .pd .price{color:#b08d3c;font-size:19px;margin:14px 0;letter-spacing:.08em}
 .pd .desc{color:#666;font-size:14px;line-height:1.9;margin:16px 0 6px}
@@ -56,99 +57,106 @@ table.sizes th{background:#faf9f6;letter-spacing:.15em;text-transform:uppercase;
 footer{border-top:1px solid #eee;padding:38px 5vw;display:flex;flex-wrap:wrap;gap:18px 34px;justify-content:center;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#888}
 footer a:hover{color:#b08d3c}
 .cta3d{display:inline-block;margin-top:20px;padding:14px 34px;border:1px solid #b08d3c;color:#b08d3c;font-size:10px;letter-spacing:.34em;text-transform:uppercase}
-@media(max-width:760px){.pd{grid-template-columns:1fr}nav{gap:15px;font-size:10px}}
+@media(max-width:760px){
+.pd{grid-template-columns:1fr}
+#navbtn{display:block}
+nav{display:none;position:absolute;top:100%;right:5vw;flex-direction:column;gap:0;background:#fff;border:1px solid #eee;box-shadow:0 12px 32px rgba(0,0,0,.09);min-width:210px;padding:8px 0;z-index:20}
+nav.open{display:flex}
+nav a{padding:13px 22px;font-size:11px}
+}
 </style>
 </head>
 <body>
 <header>
   <a href="/" class="wordmark">Voulez-Vous<small>Born to Win</small></a>
-  <nav><a href="/">3D Gallery</a><a href="/shop/">Shop</a><a href="/about-us/">About Us</a><a href="/about-gallery/">The Gallery</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a></nav>
+  <nav id="nav"><a href="/">3D Gallery</a><a href="/shop/">Shop</a><a href="/about-us/">About Us</a><a href="/about-gallery/">The Gallery</a><a href="/community/">Community</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a></nav>
+  <button id="navbtn" aria-label="Menu">☰</button>
 </header><div class="hero"><h1>The Collection</h1><div class="rule"></div>
    <p>Every Voulez-Vous piece is unisex — one design, cut for women and for men. Wear the art, walk the gallery.</p>
    <a class="cta3d" href="/">Walk the 3D Gallery</a></div>
   <main><div class="grid">
     <a class="card" href="/products/sky-rose/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink_01-back.png?v=1782816021&width=600" alt="Sky Rose — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink_01-back.png?v=1782816021&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink_01-front.png?v=1782816019&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Sky Rose — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Sky Rose</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/hope-never-dies/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Red_2-back.png?v=1782815921&width=600" alt="Hope Never Dies — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Red_2-back.png?v=1782815921&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Red_1-back.png?v=1782815891&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Hope Never Dies — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Hope Never Dies</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/wear-your-tribe/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourtribe-back.png?v=1782815817&width=600" alt="Wear Your Tribe — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourtribe-back.png?v=1782815817&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourtribe-front.png?v=1782815815&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Wear Your Tribe — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Wear Your Tribe</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/wear-your-legacy/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=600" alt="Wear Your Legacy — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-front.png?v=1782815731&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Wear Your Legacy — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Wear Your Legacy</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/drink-with-class/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightPinkSet_01-shirt-back.png?v=1782815663&width=600" alt="Drink With Class — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightPinkSet_01-shirt-back.png?v=1782815663&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightPinkSet_01-hoodie-back.png?v=1782815663&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Drink With Class — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Drink With Class</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/baby-angel/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Angel-back.png?v=1782815599&width=600" alt="Baby Angel — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Angel-back.png?v=1782815599&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Angel-front.png?v=1782815597&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Baby Angel — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Baby Angel</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/tsunami-flows/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet_01-hoodie-back.png?v=1782815531&width=600" alt="Tsunami Flows — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet_01-hoodie-back.png?v=1782815531&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet_01-hoodie-pants.png?v=1782815531&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Tsunami Flows — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Tsunami Flows</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/te-amo/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Orange-back.png?v=1782815402&width=600" alt="Te Amo — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Orange-back.png?v=1782815402&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Orange-front.png?v=1782815400&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Te Amo — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Te Amo</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/the-gateway/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightBlueSet-hoodie-back.png?v=1782815135&width=600" alt="The Gateway — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightBlueSet-hoodie-back.png?v=1782815135&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/LightBlueSet-hoodie-front.png?v=1782815132&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="The Gateway — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>The Gateway</h3><div class="p">€80</div>
     </a>
     <a class="card" href="/products/embrace-the-ocean/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet-hoodie-back.png?v=1782815054&width=600" alt="Embrace The Ocean — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet-hoodie-back.png?v=1782815054&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/DarkBlueSet-hoodie-pants.png?v=1782815042&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Embrace The Ocean — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Embrace The Ocean</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/garden-of-grace/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink-shirt-back.png?v=1782814935&width=600" alt="Garden of Grace — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink-shirt-back.png?v=1782814935&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightpink-shirt-front.png?v=1782814933&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Garden of Grace — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Garden of Grace</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/the-taj-mahal/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/TajMahal-blue-back.png?v=1782814800&width=600" alt="The Taj Mahal — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/TajMahal-blue-back.png?v=1782814800&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/TajMahal-orange-back.png?v=1782814800&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="The Taj Mahal — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>The Taj Mahal</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/full-moon/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/BlackFullMoon-Back.png?v=1782814668&width=600" alt="Full Moon — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/BlackFullMoon-Back.png?v=1782814668&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/BlackFullMoon-Front.png?v=1782814666&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Full Moon — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Full Moon</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/untitled-1/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Brownish-back.png?v=1782814584&width=600" alt="Untitled — No. I — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Brownish-back.png?v=1782814584&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Brownish-front.png?v=1782814582&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Untitled — No. I — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Untitled — No. I</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/untitled-3/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Blackwithredartwork-back.png?v=1782814500&width=600" alt="Untitled — No. III — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Blackwithredartwork-back.png?v=1782814500&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Blackwithredartwork-front.png?v=1782814499&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Untitled — No. III — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Untitled — No. III</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/untitled-5/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/VouzVouz-02_New_-back.png?v=1782814446&width=600" alt="Untitled — No. V — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/VouzVouz-02_New_-back.png?v=1782814446&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/VouzVouz-02_New_-front.png?v=1782814407&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Untitled — No. V — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Untitled — No. V</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/rose-heart/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/pink_heart-front.png?v=1782822359&width=600" alt="Rose Heart — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/pink_heart-front.png?v=1782822359&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Blue_heart-front.png?v=1782822359&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Rose Heart — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Rose Heart</h3><div class="p">€0</div>
     </a>
     <a class="card" href="/products/monaco/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream_01-shirt-back.png?v=1782822614&width=600" alt="Monaco — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream_01-shirt-back.png?v=1782822614&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream_01-shirt-front.png?v=1782822615&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Monaco — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Monaco</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/earn-your-stripes/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream-shirt-back.png?v=1782822720&width=600" alt="Earn Your Stripes — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream-shirt-back.png?v=1782822720&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Lightcream-shirt-front.png?v=1782822719&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Earn Your Stripes — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Earn Your Stripes</h3><div class="p">€45</div>
     </a>
     <a class="card" href="/products/tennis/">
-      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/White_with_pink_artwork-back.png?v=1782823024&width=600" alt="Tennis — Voulez-Vous art-wear" loading="lazy">
+      <img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/White_with_pink_artwork-back.png?v=1782823024&width=600" data-alt="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/White_with_pink_artwork-front.png?v=1782823022&width=600" onmouseenter="this.dataset.k=this.src;this.src=this.dataset.alt" onmouseleave="this.src=this.dataset.k" alt="Tennis — Voulez-Vous unisex art-wear t-shirt" loading="lazy">
       <h3>Tennis</h3><div class="p">€45</div>
     </a></div></main>
 <footer>
   <a href="/faq/">FAQ</a><a href="/community/">Community</a><a href="/terms/">Terms &amp; Conditions</a><a href="/privacy/">Privacy &amp; Cookies</a>
   <a href="/shipping-returns/">Shipping &amp; Returns</a><a href="/contact/">Contact Us</a>
   <span>© 2026 Voulez Vous — Born To Win</span>
-</footer></body></html>
+</footer><script>document.getElementById('navbtn').onclick=()=>document.getElementById('nav').classList.toggle('open');</script></body></html>

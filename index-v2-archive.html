@@ -11,38 +11,15 @@
 canvas{display:block}
 :root{--gold:#c9a84a}
 #hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);color:#cbb88a;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;background:rgba(12,12,12,.42);padding:6px 14px;border-radius:20px;pointer-events:none;z-index:9;border:1px solid rgba(201,168,74,.25)}
-@media(max-width:760px){#hint{bottom:152px;font-size:9.5px;padding:6px 12px;white-space:nowrap;max-width:94vw}} /* phones: sit ABOVE the joysticks, one line */
 #stick,#stickR{position:fixed;bottom:26px;width:112px;height:112px;border-radius:50%;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);touch-action:none;z-index:10;background:radial-gradient(circle,#9b9b9b 0%,#6b6b6b 100%);border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 0 14px rgba(0,0,0,.35)}
 #stick{left:26px}#stickR{right:26px}
 #stick::before,#stickR::before{content:'';position:absolute;inset:9px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23eeeeee'%3E%3Cpolygon points='50,9 42,25 58,25'/%3E%3Cpolygon points='91,50 75,42 75,58'/%3E%3Cpolygon points='50,91 42,75 58,75'/%3E%3Cpolygon points='9,50 25,42 25,58'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;opacity:.78;pointer-events:none}
 #knob,#knobR{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:radial-gradient(circle,#dcdcdc,#9a9a9a);border:1px solid rgba(255,255,255,.5)}
 #xh{position:fixed;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgba(201,168,74,.6);box-shadow:0 0 0 4px rgba(255,255,255,.18);pointer-events:none;z-index:9}
 /* gameplay HUD stays hidden until the fly-in lands (never overlaps the loading/intro) */
-#stick,#stickR,#bagbtn,#xh,#hint,#gsw,#menubar,#menubtn{opacity:0;transition:opacity .55s ease}
-body{-webkit-tap-highlight-color:transparent}
-#stick,#stickR,#bagbtn,#gsw,#hint,#menubar,#menubtn,canvas{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-/* ── glass menu: 2D pages from inside the gallery ── */
-#menubar{position:fixed;top:16px;left:16px;z-index:55;display:flex;align-items:center;gap:2px;padding:4px 8px;background:rgba(12,12,12,.5);border:1px solid rgba(201,168,74,.4);border-radius:22px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-#menubar a{color:rgba(241,237,229,.82);font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;padding:7px 11px;border-radius:16px;transition:color .3s,background .3s;font-family:'Josefin Sans','Helvetica Neue',sans-serif}
-#menubar a:hover{color:#151310;background:linear-gradient(to right,var(--gold),#e0c267)}
-#menubtn{position:fixed;top:16px;left:16px;z-index:55;width:42px;height:42px;border-radius:50%;background:rgba(12,12,12,.5);border:1px solid rgba(201,168,74,.4);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f1ede5;font-size:17px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer}
-#mmenu{position:fixed;top:66px;left:16px;z-index:55;display:none;flex-direction:column;min-width:180px;padding:8px;background:rgba(12,12,12,.72);border:1px solid rgba(201,168,74,.4);border-radius:14px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-#mmenu.open{display:flex}
-#mmenu a{color:rgba(241,237,229,.88);font-size:11px;letter-spacing:.24em;text-transform:uppercase;text-decoration:none;padding:12px 14px;border-radius:9px;font-family:'Josefin Sans','Helvetica Neue',sans-serif}
-#mmenu a:active,#mmenu a:hover{color:#151310;background:linear-gradient(to right,var(--gold),#e0c267)}
-@media(max-width:900px){#menubar{display:none}#menubtn{display:flex}} /* phones: hamburger replaces the bar; pill/bag stay put */
+#stick,#stickR,#bagbtn,#xh,#hint{opacity:0;transition:opacity .55s ease}
 body:not(.playing) #stick,body:not(.playing) #stickR,body:not(.playing) #bagbtn{pointer-events:none}
-body:not(.playing):not(.intro) #menubar,body:not(.playing):not(.intro) #menubtn{pointer-events:none}
-body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,body.playing #hint,body.playing #gsw,body.playing #menubar,body.playing #menubtn{opacity:1}
-body.intro #menubar,body.intro #menubtn{opacity:1}
-/* ── gender switcher (day/night-style pill) ── */
-#gsw{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;background:rgba(12,12,12,.5);border:1px solid rgba(201,168,74,.4);border-radius:22px;padding:4px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-family:'Josefin Sans','Helvetica Neue',sans-serif}
-#gsw button{border:none;background:transparent;color:rgba(241,237,229,.55);font-family:inherit;font-size:10px;letter-spacing:.22em;text-transform:uppercase;padding:7px 16px;border-radius:18px;cursor:pointer;transition:color .3s,background .3s}
-#gsw button.on{background:linear-gradient(to right,var(--gold),#e0c267);color:#151310}
-/* intro gender chooser */
-.i-gender{display:flex;gap:0;margin-top:30px;border:1px solid rgba(255,255,255,.28);border-radius:2px;overflow:hidden}
-.i-gender button{border:none;background:transparent;color:rgba(255,255,255,.55);font-family:'Josefin Sans','Helvetica Neue',sans-serif;font-size:10px;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;padding:13px 30px;cursor:pointer;transition:color .3s,background .3s}
-.i-gender button.on{background:linear-gradient(to right,var(--gold),#e0c267);color:#151310}
+body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,body.playing #hint{opacity:1}
 /* ── loading + intro overlays (previous-version style) ── */
 #load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 38%,#171717 0%,#000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:opacity 1.1s ease}
 #load.gone{opacity:0;pointer-events:none}
@@ -134,14 +111,6 @@ body.intro #menubar,body.intro #menubtn{opacity:1}
 <body>
 <canvas id="c"></canvas>
 <div id="hint">left stick / wasd · walk &nbsp;·&nbsp; right stick / drag · look &nbsp;·&nbsp; tap a piece</div>
-<div id="gsw"><button data-g="female" class="on">Women</button><button data-g="male">Men</button></div>
-<nav id="menubar">
-  <a href="/shop/">Shop</a><a href="/about-us/">About</a><a href="/about-gallery/">The Gallery</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a>
-</nav>
-<button id="menubtn" aria-label="Menu">☰</button>
-<nav id="mmenu">
-  <a href="/shop/">Shop</a><a href="/about-us/">About</a><a href="/about-gallery/">The Gallery</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a>
-</nav>
 <div id="stick"><div id="knob"></div></div>
 <div id="stickR"><div id="knobR"></div></div>
 <div id="xh"></div>
@@ -181,17 +150,10 @@ body.intro #menubar,body.intro #menubtn{opacity:1}
     <b>Drag / Right stick</b> &nbsp;·&nbsp; Look around<br>
     <b>Tap</b> &nbsp;·&nbsp; View piece
   </div>
-  <div class="i-gender" id="iGender">
-    <button data-g="female" class="on">Womenswear</button>
-    <button data-g="male">Menswear</button>
-  </div>
   <button class="i-btn" id="enterBtn"><span>Enter the Gallery</span></button>
   <a class="poweredby" href="https://www.auzsolutions.com/" target="_blank" rel="noopener">Powered by <b>Auz Solutions</b></a>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- STAGING: GLB mannequin loaders -->
-<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 <script src="assets/3d/RGBELoader.js"></script>
 <script>
 const canvas=document.getElementById('c');
@@ -222,7 +184,6 @@ const stepO=Math.PI*2/N_OUT, stepI=Math.PI*2/N_IN;
 const camStart={pos:new THREE.Vector3(0,9.4,R_OUT+12),yaw:-0.05,pitch:-0.34};
 const camEnd  ={pos:new THREE.Vector3(0,2.0,R_OUT+1.4),yaw:-0.24,pitch:-0.02}; // arrive at the entrance threshold (inside the terrace wall), looking into the gallery
 let yaw=camStart.yaw,pitch=camStart.pitch;
-window.__g={setCam(x,y,z,yw,pt){camera.position.set(x,y,z);yaw=yw;pitch=pt;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;renderer.render(scene,camera);}};
 camera.position.copy(camStart.pos);
 let entered=false,flyT=0;
 
@@ -230,11 +191,10 @@ let entered=false,flyT=0;
 const keys={},move={x:0,y:0},look={x:0,y:0};
 addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;});
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
-let dragId=null,lx=0,ly=0,moved=0;   // track WHICH pointer owns the look-drag — joystick fingers must never trigger look or pick
-canvas.addEventListener('pointerdown',e=>{if(dragId!==null)return;dragId=e.pointerId;lx=e.clientX;ly=e.clientY;moved=0;});
-addEventListener('pointerup',e=>{if(e.pointerId!==dragId)return;if(moved<7&&e.target===canvas&&entered&&flyT>=1)pick(e.clientX,e.clientY);dragId=null;});
-addEventListener('pointercancel',e=>{if(e.pointerId===dragId)dragId=null;});
-addEventListener('pointermove',e=>{if(e.pointerId!==dragId)return;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);if(entered&&flyT>=1){yaw-=(e.clientX-lx)*0.0028;pitch=Math.max(-0.85,Math.min(1.25,pitch-(e.clientY-ly)*0.0022));}lx=e.clientX;ly=e.clientY;});
+let drag=false,lx=0,ly=0,moved=0;
+canvas.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;moved=0;});
+addEventListener('pointerup',e=>{if(drag&&moved<7&&entered&&flyT>=1)pick(e.clientX,e.clientY);drag=false;});
+addEventListener('pointermove',e=>{if(!drag)return;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);if(entered&&flyT>=1){yaw-=(e.clientX-lx)*0.0028;pitch=Math.max(-0.85,Math.min(1.25,pitch-(e.clientY-ly)*0.0022));}lx=e.clientX;ly=e.clientY;});
 function makeStick(el,knob,t){
   let id=null,cx=0,cy=0;
   const reset=()=>{id=null;t.x=0;t.y=0;knob.style.transform='';};
@@ -256,7 +216,7 @@ let targetP=0,shownP=0,autoStarted=false;
 function setProg(p,msg){targetP=Math.max(targetP,p);if(msg)lstat.textContent=msg;}
 function showIntro(){if(autoStarted)return;autoStarted=true;lstat.textContent='Welcome';
   const load=document.getElementById('load'),intro=document.getElementById('intro');
-  setTimeout(()=>{load.classList.add('gone');setTimeout(()=>{load.style.display='none';intro.classList.add('show');document.body.classList.add('intro');},1100);},350);}
+  setTimeout(()=>{load.classList.add('gone');setTimeout(()=>{load.style.display='none';intro.classList.add('show');},1100);},350);}
 const loadTimer=setInterval(()=>{
   shownP+=Math.min(1.2,Math.max(0.4,(targetP-shownP)*0.06));if(shownP>targetP)shownP=targetP; // paced so the intro animation breathes (~2.5s min)
   barfill.style.width=shownP+'%';pct.textContent=Math.round(shownP)+'%';
@@ -501,133 +461,6 @@ for(let i=0;i<N_IN;i++){const a=(i+0.5)*stepI, fr=R_IN-0.5, nx=Math.sin(a), nz=M
   const c=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));
   c.position.set(nx*(fr-0.075),PROD_Y,nz*(fr-0.075));c.rotation.y=a+Math.PI;c.userData.idx=i;scene.add(c);artCanvases.push(c);picks.push(c,f,back);f.userData.idx=i;
 }
-/* ── gender-aware mannequin pedestals on all 20 slots ── */
-const IS_MOBILE=(navigator.maxTouchPoints>0&&Math.min(innerWidth,innerHeight)<900)||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-if(IS_MOBILE)renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); // phones: fill-rate relief
-if(IS_MOBILE)document.getElementById('hint').innerHTML='left stick · walk &nbsp;·&nbsp; right · look &nbsp;·&nbsp; tap a piece'; // short one-liner, no WASD on touch
-const NEAR_DIST=34;                        // mobile: covers the whole rotunda — nearest pedestals still load first, none stay empty
-const TARGET_H=1.8;
-let GENDER='female';                       // chosen on the intro screen; flips via the HUD pill
-const PEDS=[];                             // {slot,a,px,pz,models:{male,female},loading:{}}
-let vvModels=[];                           // currently visible models (turntable loop)
-const gltfLoader=(()=>{const d=new THREE.DRACOLoader();d.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');const g=new THREE.GLTFLoader();g.setDRACOLoader(d);return g;})();
-const maxAniso=renderer.capabilities.getMaxAnisotropy();
-
-function prepModel(m,ped){                 // strip junk plane, scale, place, whiten
-  const junk=[];
-  m.traverse(o=>{ if(o.isMesh){ if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();
-    const s=new THREE.Vector3();o.geometry.boundingBox.getSize(s);
-    if(Math.max(s.x,s.y,s.z)>4) junk.push(o); }});
-  junk.forEach(o=>o.parent&&o.parent.remove(o));
-  const box0=new THREE.Box3().setFromObject(m), h0=box0.max.y-box0.min.y;
-  m.scale.setScalar(TARGET_H/h0);
-  const box=new THREE.Box3().setFromObject(m), c=box.getCenter(new THREE.Vector3());
-  m.position.set(ped.px-c.x, 0.35-box.min.y, ped.pz-c.z);
-  m.rotation.y=m.userData.baseRot=ped.a+Math.PI;
-  m.traverse(o=>{ if(o.isMesh){
-    (Array.isArray(o.material)?o.material:[o.material]).forEach(mat=>{ if(!mat)return;
-      if(/body/i.test(mat.name||'')){mat.color&&mat.color.set(0xefeae2);if('roughness'in mat)mat.roughness=0.5;}
-      if(mat.map){
-        if(IS_MOBILE)shrinkTex(mat.map,1024);          // 2K→1K = 4× less GPU memory per map (phones crash-reboot otherwise)
-        mat.map.anisotropy=IS_MOBILE?Math.min(4,maxAniso):maxAniso;mat.map.needsUpdate=true;
-      }
-    });
-  }});
-  return m;
-}
-function shrinkTex(t,max){ // redraw oversized texture images at a phone-safe resolution
-  const im=t.image;if(!im||!im.width||Math.max(im.width,im.height)<=max)return;
-  const s=max/Math.max(im.width,im.height);
-  const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
-  c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-  t.image=c;t.needsUpdate=true;
-}
-function disposeModel(m){ // mobile memory relief when flipping gender
-  m.traverse(o=>{ if(o.isMesh){ o.geometry.dispose();
-    (Array.isArray(o.material)?o.material:[o.material]).forEach(mt=>{ if(!mt)return;
-      ['map','normalMap','roughnessMap','metalnessMap','aoMap','emissiveMap'].forEach(k=>{if(mt[k])mt[k].dispose();});
-      mt.dispose(); });
-  }});
-  scene.remove(m);
-}
-
-/* simple 2-at-a-time load queue, nearest-to-entrance first */
-const loadQ=[];let inFlight=0;
-function pump(){
-  while(inFlight<2&&loadQ.length){
-    const job=loadQ.shift();
-    if(job.ped.models[job.g]||job.ped.loading[job.g])continue;
-    job.ped.loading[job.g]=true;inFlight++;
-    gltfLoader.load(encodeURI(job.file),gltf=>{
-      inFlight--;job.ped.loading[job.g]=false;
-      const m=prepModel(gltf.scene,job.ped);
-      job.ped.models[job.g]=m;scene.add(m);
-      m.visible=(job.g===GENDER);
-      if(m.visible)vvModels.push(m);
-      pump();
-    },undefined,err=>{inFlight--;job.ped.loading[job.g]=false;console.warn('[VV] load failed',job.file,err);pump();});
-  }
-}
-function pedNear(ped){const dx=camera.position.x-ped.px,dz=camera.position.z-ped.pz;return Math.hypot(dx,dz)<NEAR_DIST;}
-function queueGender(g,proximityOnly){
-  PEDS.forEach(ped=>{
-    const f=ped.design[g];
-    if(!f||ped.models[g]||ped.loading[g])return;
-    if(proximityOnly&&!pedNear(ped))return;
-    if(loadQ.some(j=>j.ped===ped&&j.g===g))return;
-    loadQ.push({ped,g,file:f});
-  });
-  pump();
-}
-function setGender(g){
-  if(g!==GENDER){
-    const old=GENDER;GENDER=g;
-    vvModels=[];
-    PEDS.forEach(ped=>{
-      const eff=ped.design[g]?g:(ped.design.male?'male':'female'); // gender file missing → other gender stands in
-      for(const k of ['male','female']){const m=ped.models[k];if(m){m.visible=(k===eff);if(m.visible)vvModels.push(m);}}
-      if(IS_MOBILE&&old!==eff&&ped.models[old]){disposeModel(ped.models[old]);ped.models[old]=null;} // free GPU memory on phones
-    });
-    queueGender(g,IS_MOBILE);              // fetch missing models of this gender (near-only on mobile)
-  }
-  document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
-}
-document.querySelectorAll('#gsw button,.i-gender button').forEach(b=>b.onclick=()=>setGender(b.dataset.g));
-/* mobile menu toggle — closes on outside tap */
-const mBtn=document.getElementById('menubtn'),mMenu=document.getElementById('mmenu');
-mBtn.onclick=e=>{e.stopPropagation();mMenu.classList.toggle('open');};
-addEventListener('pointerdown',e=>{if(mMenu.classList.contains('open')&&!mMenu.contains(e.target)&&e.target!==mBtn)mMenu.classList.remove('open');});
-
-fetch('assets/models/manifest.json?v=3').then(r=>r.json()).then(designs=>{ // ?v= busts the year-long assets cache — bump when the manifest changes
-  // the 20 primary designs — one per Shopify product, tap opens the RIGHT product (design.handle)
-  const paired=designs.filter(d=>d.primary&&(d.male||d.female)); // a design missing one gender still gets its pedestal (other gender stands in)
-  // ordered so the first ones flank the entrance (a≈0 is +Z)
-  const order=[...Array(N_IN).keys()].sort((i,j)=>{
-    const da=Math.min((i+0.5)*stepI,Math.PI*2-(i+0.5)*stepI), db=Math.min((j+0.5)*stepI,Math.PI*2-(j+0.5)*stepI);
-    return da-db;});
-  order.forEach((slot,k)=>{
-    if(k>=paired.length)return;
-    const a=(slot+0.5)*stepI, r=R_IN-2.4;
-    const ped={slot,a,px:Math.sin(a)*r,pz:Math.cos(a)*r,design:paired[k],models:{},loading:{}};
-    const plinth=new THREE.Mesh(new THREE.CylinderGeometry(0.85,0.95,0.35,48),
-      new THREE.MeshStandardMaterial({color:0xece7dd,roughness:.85,metalness:0,envMapIntensity:.3}));
-    plinth.position.set(ped.px,0.175,ped.pz);scene.add(plinth);
-    [picks[slot*3],picks[slot*3+1],picks[slot*3+2]].forEach(o=>{if(o)o.visible=false;});
-    const prox=new THREE.Mesh(new THREE.BoxGeometry(1.1,2.0,0.7),new THREE.MeshBasicMaterial({visible:false}));
-    prox.position.set(ped.px,1.35,ped.pz);prox.userData.handle=paired[k].handle;scene.add(prox);picks.push(prox);
-    PEDS.push(ped);
-  });
-  if(IS_MOBILE){
-    queueGender(GENDER,true);              // phones: only what's near the entrance now
-    setInterval(()=>{
-      const walking=move.x||move.y||keys['w']||keys['a']||keys['s']||keys['d']; // only WALKING defers loads; looking around doesn't
-      if(!walking)queueGender(GENDER,true); // all 20 fill in nearest-first, so no pedestal stays empty
-    },800);
-  }else{
-    queueGender(GENDER);                   // desktop: everything, nearest first
-    setTimeout(()=>queueGender(GENDER==='female'?'male':'female'),9000); // pre-warm the other gender
-  }
-}).catch(e=>console.warn('[VV] manifest',e));
 /* live Shopify catalogue */
 const SHOP={domain:'tr8sqy-hc.myshopify.com',token:'5982b791c1d88a94fe141015ef5a1967',ver:'2024-07'};
 let PRODUCTS=[];
@@ -635,7 +468,7 @@ let PRODUCTS=[];
   const q='{products(first:30){nodes{title handle featuredImage{url} priceRange{minVariantPrice{amount currencyCode}} options{name values} variants(first:100){nodes{id title availableForSale price{amount currencyCode} selectedOptions{name value}}}}}}';
   const res=await fetch(`https://${SHOP.domain}/api/${SHOP.ver}/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':SHOP.token},body:JSON.stringify({query:q})});
   const prods=((await res.json()).data.products.nodes)||[];
-  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&(p.featuredImage.url+(p.featuredImage.url.includes('?')?'&':'?')+'width=900'),price:p.priceRange&&p.priceRange.minVariantPrice,handle:p.handle,
+  PRODUCTS=prods.map(p=>({title:p.title,img:p.featuredImage&&p.featuredImage.url,price:p.priceRange&&p.priceRange.minVariantPrice,handle:p.handle,
     options:((p.options)||[]).map(o=>({name:o.name,values:o.values})),
     variants:((p.variants&&p.variants.nodes)||[]).map(v=>({id:v.id,label:v.title,available:v.availableForSale,price:v.price,opts:Object.fromEntries(((v.selectedOptions)||[]).map(s=>[s.name,s.value]))}))}));
   const tl=new THREE.TextureLoader();tl.setCrossOrigin('anonymous');
@@ -730,10 +563,7 @@ function pick(x,y){
   const ndc=new THREE.Vector2((x/innerWidth)*2-1,-(y/innerHeight)*2+1);
   ray.setFromCamera(ndc,camera);
   const hit=ray.intersectObjects(picks,false)[0];
-  if(!hit)return;
-  const ud=hit.object.userData;
-  const p=ud.handle?PRODUCTS.find(x=>x.handle===ud.handle):PRODUCTS[ud.idx]; // mannequins resolve by product handle
-  if(!p)return;
+  if(!hit)return;const p=PRODUCTS[hit.object.userData.idx];if(!p)return;
   openPanel(p);
 }
 
@@ -767,7 +597,7 @@ scene.add(new THREE.AmbientLight(0xf3ede0,0.32)); // baseline fill so walls neve
 const sun=new THREE.DirectionalLight(0xfff4e2,2.0);sun.position.set(18,28,12);scene.add(sun);
 
 /* ── intro "Enter the Gallery" button → begin the fly-in ── */
-document.getElementById('enterBtn').addEventListener('click',()=>{document.body.classList.remove('intro');
+document.getElementById('enterBtn').addEventListener('click',()=>{
   const intro=document.getElementById('intro');intro.style.opacity='0';intro.style.pointerEvents='none';
   setTimeout(()=>{intro.style.display='none';entered=true;},650);
 });
@@ -780,7 +610,6 @@ function loop(){
   const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime,spd=4.6;
   // ── always-on ambient motion ──
   rockGroup.rotation.y=t*0.12;spiralGroup.rotation.y=-t*0.25;
-  for(const vm of vvModels)vm.rotation.y=vm.userData.baseRot+(window.__frz?0:t*0.22); // STAGING: slow turntables (freezable for capture)
   chand.rotation.y=t*0.045;chand.rotation.z=Math.sin(t*0.55)*0.014;
   chLight.intensity=56+Math.sin(t*4.7)*7;flameM.emissiveIntensity=2.2+Math.sin(t*11)*0.45;
 

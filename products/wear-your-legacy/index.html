@@ -19,6 +19,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 .wordmark{font-size:17px;letter-spacing:.28em;text-transform:uppercase;font-weight:600}
 .wordmark small{display:block;font-size:8px;letter-spacing:.5em;color:#b08d3c;margin-top:3px}
 nav{display:flex;gap:26px;font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+#navbtn{display:none;background:none;border:1px solid #ddd;border-radius:8px;font-size:18px;padding:6px 12px;cursor:pointer;color:#161616}
 nav a:hover{color:#b08d3c}
 .hero{padding:52px 5vw 8px;text-align:center}
 .hero h1{font-size:26px;letter-spacing:.3em;text-transform:uppercase;font-weight:400}
@@ -26,11 +27,11 @@ nav a:hover{color:#b08d3c}
 .rule{width:54px;height:2px;background:#b08d3c;margin:22px auto}
 main{padding:30px 5vw 70px;max-width:1200px;margin:0 auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:34px 26px}
-.card img{width:100%;aspect-ratio:1;object-fit:cover;background:#f6f5f2}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f5f2}
 .card h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-top:13px}
 .card .p{color:#b08d3c;font-size:13px;margin-top:5px;letter-spacing:.08em}
 .pd{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start}
-.pd img{width:100%;aspect-ratio:1;object-fit:cover;background:#f6f5f2}
+.pd img{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f5f2;cursor:pointer}
 .pd h1{font-size:22px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
 .pd .price{color:#b08d3c;font-size:19px;margin:14px 0;letter-spacing:.08em}
 .pd .desc{color:#666;font-size:14px;line-height:1.9;margin:16px 0 6px}
@@ -56,15 +57,23 @@ table.sizes th{background:#faf9f6;letter-spacing:.15em;text-transform:uppercase;
 footer{border-top:1px solid #eee;padding:38px 5vw;display:flex;flex-wrap:wrap;gap:18px 34px;justify-content:center;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#888}
 footer a:hover{color:#b08d3c}
 .cta3d{display:inline-block;margin-top:20px;padding:14px 34px;border:1px solid #b08d3c;color:#b08d3c;font-size:10px;letter-spacing:.34em;text-transform:uppercase}
-@media(max-width:760px){.pd{grid-template-columns:1fr}nav{gap:15px;font-size:10px}}
+@media(max-width:760px){
+.pd{grid-template-columns:1fr}
+#navbtn{display:block}
+nav{display:none;position:absolute;top:100%;right:5vw;flex-direction:column;gap:0;background:#fff;border:1px solid #eee;box-shadow:0 12px 32px rgba(0,0,0,.09);min-width:210px;padding:8px 0;z-index:20}
+nav.open{display:flex}
+nav a{padding:13px 22px;font-size:11px}
+}
 </style><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Wear Your Legacy","description":"Wear Your Legacy — Voulez-Vous, Born To Win. 2025 Collection.","image":["https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=1100","https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-front.png?v=1782815731&width=1100"],"url":"https://voulezvousbtw.com/products/wear-your-legacy/","brand":{"@type":"Brand","name":"Voulez-Vous"},"offers":{"@type":"Offer","priceCurrency":"EUR","price":"45.0","availability":"https://schema.org/InStock","url":"https://voulezvousbtw.com/products/wear-your-legacy/"}}</script>
 </head>
 <body>
 <header>
   <a href="/" class="wordmark">Voulez-Vous<small>Born to Win</small></a>
-  <nav><a href="/">3D Gallery</a><a href="/shop/">Shop</a><a href="/about-us/">About Us</a><a href="/about-gallery/">The Gallery</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a></nav>
+  <nav id="nav"><a href="/">3D Gallery</a><a href="/shop/">Shop</a><a href="/about-us/">About Us</a><a href="/about-gallery/">The Gallery</a><a href="/community/">Community</a><a href="/faq/">FAQ</a><a href="/contact/">Contact</a></nav>
+  <button id="navbtn" aria-label="Menu">☰</button>
 </header><main style="padding-top:52px"><div class="pd">
-      <div><img id="hero" src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=1100" alt="Wear Your Legacy — Voulez-Vous art-wear">
+      <div><img id="hero" src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=1100" alt="Wear Your Legacy — Voulez-Vous unisex art-wear, front and back views" title="Click to flip front / back">
+        <p style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#999;margin-top:8px;text-align:center">Click photo to flip · front / back</p>
         <div class="thumbs"><img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=240" data-full="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=1100" alt="" onclick="hero.src=this.dataset.full"><img src="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-front.png?v=1782815731&width=240" data-full="https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-front.png?v=1782815731&width=1100" alt="" onclick="hero.src=this.dataset.full"></div></div>
       <div>
         <h1>Wear Your Legacy</h1>
@@ -78,6 +87,8 @@ footer a:hover{color:#b08d3c}
     <script>
     const SHOP={"domain":"tr8sqy-hc.myshopify.com","token":"5982b791c1d88a94fe141015ef5a1967","ver":"2024-07"};
     const P={"options":[{"name":"Size","values":["XS","S","M","L","XL"]}],"variants":[{"id":"gid://shopify/ProductVariant/53838684946775","available":true,"price":{"amount":"45.0","currencyCode":"EUR"},"opts":{"Size":"XS"}},{"id":"gid://shopify/ProductVariant/53838684979543","available":true,"price":{"amount":"45.0","currencyCode":"EUR"},"opts":{"Size":"S"}},{"id":"gid://shopify/ProductVariant/53838685012311","available":true,"price":{"amount":"45.0","currencyCode":"EUR"},"opts":{"Size":"M"}},{"id":"gid://shopify/ProductVariant/53838685045079","available":true,"price":{"amount":"45.0","currencyCode":"EUR"},"opts":{"Size":"L"}},{"id":"gid://shopify/ProductVariant/53838685077847","available":true,"price":{"amount":"45.0","currencyCode":"EUR"},"opts":{"Size":"XL"}}]};
+    const IMGS=["https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-back.png?v=1782815732&width=1100","https://cdn.shopify.com/s/files/1/1023/5966/2935/files/Wearyourlegacy-front.png?v=1782815731&width=1100"];let hi=0;
+    if(IMGS.length>1)document.getElementById('hero').onclick=()=>{hi=(hi+1)%IMGS.length;document.getElementById('hero').src=IMGS[hi]};
     const sel={};const opts=document.getElementById('opts');
     const money=m=>(m.currencyCode==='EUR'?'€':m.currencyCode+' ')+Math.round(parseFloat(m.amount));
     function variantFor(){return P.variants.find(v=>P.options.every(o=>v.opts[o.name]===sel[o.name]))}
@@ -117,4 +128,4 @@ footer a:hover{color:#b08d3c}
   <a href="/faq/">FAQ</a><a href="/community/">Community</a><a href="/terms/">Terms &amp; Conditions</a><a href="/privacy/">Privacy &amp; Cookies</a>
   <a href="/shipping-returns/">Shipping &amp; Returns</a><a href="/contact/">Contact Us</a>
   <span>© 2026 Voulez Vous — Born To Win</span>
-</footer></body></html>
+</footer><script>document.getElementById('navbtn').onclick=()=>document.getElementById('nav').classList.toggle('open');</script></body></html>
