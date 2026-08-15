@@ -551,6 +551,18 @@ function disposeModel(m){ // mobile memory relief when flipping gender
   scene.remove(m);
 }
 
+/* Eros' bow for the male figures — the batch exports only kept the arrow, so we graft the bow from the master file */
+let bowProto=null,bowBusy=false,bowWait=[];
+function withBow(cb){
+  if(bowProto)return cb(bowProto);
+  bowWait.push(cb);
+  if(bowBusy)return;bowBusy=true;
+  gltfLoader.load('assets/models/male/bow.glb',g=>{bowProto=g.scene;bowWait.forEach(f=>f(bowProto));bowWait=[];},
+    undefined,e=>console.warn('[VV] bow',e));
+}
+function attachBow(model){ // same rig across all males → the bow's own transform lands it in the left hand
+  withBow(b=>{if(!model.userData.hasBow){model.userData.hasBow=true;model.add(b.clone(true));}});
+}
 /* simple 2-at-a-time load queue, nearest-to-entrance first */
 const loadQ=[];let inFlight=0;
 function pump(){
@@ -561,6 +573,7 @@ function pump(){
     gltfLoader.load(encodeURI(job.file),gltf=>{
       inFlight--;job.ped.loading[job.g]=false;
       const m=prepModel(gltf.scene,job.ped);
+      if(job.g==='male')attachBow(m);
       job.ped.models[job.g]=m;scene.add(m);
       m.visible=(job.g===GENDER);
       if(m.visible)vvModels.push(m);
