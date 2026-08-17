@@ -48,9 +48,6 @@ body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,b
 #intro .i-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,var(--gold),#e0c267);transform:scaleX(0);transform-origin:left;transition:transform .42s cubic-bezier(.66,0,.34,1)}
 #intro .i-btn:hover::before{transform:scaleX(1)}
 #intro .i-btn:hover{color:#111;border-color:#e0c267}
-.poweredby{position:absolute;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);text-decoration:none;white-space:nowrap;z-index:2}
-.poweredby b{color:var(--gold);font-weight:600;letter-spacing:.16em}
-.poweredby:hover{color:rgba(255,255,255,.6)}.poweredby:hover b{color:#e0c267}
 /* real brand logo — shown on its white background as a card */
 .blogo{width:auto;height:auto;background:#fff;border-radius:10px;box-shadow:0 18px 55px rgba(0,0,0,.5)}
 #load .blogo{width:300px;margin-bottom:30px;opacity:0;animation:fadeUp 1s ease .4s forwards}
@@ -140,7 +137,6 @@ body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,b
   <div class="bar"><i id="barfill"></i></div>
   <div class="pct" id="pct">0%</div>
   <div class="st" id="lstat">Preparing the gallery…</div>
-  <a class="poweredby" href="https://www.auzsolutions.com/" target="_blank" rel="noopener">Powered by <b>Auz Solutions</b></a>
 </div>
 <div id="intro">
   <img class="blogo" src="assets/vv-logo.jpg" alt="Voulez-Vous — Born To Win">
@@ -151,7 +147,6 @@ body.playing #stick,body.playing #stickR,body.playing #bagbtn,body.playing #xh,b
     <b>Tap</b> &nbsp;·&nbsp; View piece
   </div>
   <button class="i-btn" id="enterBtn"><span>Enter the Gallery</span></button>
-  <a class="poweredby" href="https://www.auzsolutions.com/" target="_blank" rel="noopener">Powered by <b>Auz Solutions</b></a>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/3d/RGBELoader.js"></script>
